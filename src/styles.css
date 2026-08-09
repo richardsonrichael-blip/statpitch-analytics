@@ -148,3 +148,9 @@
     opacity: 0;
   }
 }
+
+#lovable-badge,
+a[href*="lovable.dev"] {
+  display: none !important;
+}
+
