@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
 import { HeroMatch } from "@/components/statpitch/HeroMatch";
@@ -6,7 +7,13 @@ import { FixturesTab } from "@/components/statpitch/FixturesTab";
 import { H2HTab } from "@/components/statpitch/H2HTab";
 import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
-import { fixtures } from "@/data/football";
+import { getMatches } from "@/lib/matches.functions";
+
+const matchesQueryOptions = queryOptions({
+  queryKey: ["matches"],
+  queryFn: () => getMatches(),
+  staleTime: 60_000,
+});
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,28 +33,36 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(matchesQueryOptions),
   component: Index,
+  errorComponent: ({ error }) => (
+    <p role="alert" className="p-8 text-sm text-destructive">
+      {error.message}
+    </p>
+  ),
+  notFoundComponent: () => <p className="p-8 text-sm text-muted-foreground">No matches found.</p>,
 });
 
 const tabs = ["Fixtures & Trends", "H2H Comparison", "Value Bets / Analytics"] as const;
 
 function Index() {
+  const { data } = useSuspenseQuery(matchesQueryOptions);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<(typeof tabs)[number]>("Fixtures & Trends");
   const [pricingOpen, setPricingOpen] = useState(false);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return fixtures;
-    return fixtures.filter((f) =>
+    if (!q) return data.fixtures;
+    return data.fixtures.filter((f) =>
       [f.home, f.away, f.league].some((v) => v.toLowerCase().includes(q)),
     );
-  }, [query]);
+  }, [query, data.fixtures]);
 
   return (
     <div className="min-h-screen">
       <AppHeader
-        liveCount={7}
+        liveCount={data.liveCount}
         query={query}
         onQueryChange={setQuery}
         onGoPro={() => setPricingOpen(true)}
@@ -78,7 +93,10 @@ function Index() {
       </main>
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
-        StatPitch Analytics · Stats are illustrative and for analysis only.
+        StatPitch Analytics ·{" "}
+        {data.source === "live"
+          ? "Live data from Football-Data.org."
+          : "Showing sample data — live feed unavailable."}
       </footer>
 
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
