@@ -1,6 +1,7 @@
 import { valueBets } from "@/data/football";
+import { openPaystackCheckout } from "@/lib/utils";
 
-export function ValueBetsTab({ onGoPro }: { onGoPro: () => void }) {
+export function ValueBetsTab() {
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-surface card-shadow">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
@@ -9,7 +10,7 @@ export function ValueBetsTab({ onGoPro }: { onGoPro: () => void }) {
           <p className="text-xs text-muted-foreground">Model probability vs market implied probability</p>
         </div>
         <button
-          onClick={onGoPro}
+          onClick={openPaystackCheckout}
           className="rounded-full border border-neon/40 bg-neon/10 px-3 py-1.5 text-xs font-bold text-neon"
         >
           Unlock AI predictions

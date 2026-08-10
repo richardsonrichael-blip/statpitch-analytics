@@ -1,15 +1,14 @@
 import { Search, Zap } from "lucide-react";
+import { openPaystackCheckout } from "@/lib/utils";
 
 export function AppHeader({
   liveCount,
   query,
   onQueryChange,
-  onGoPro,
 }: {
   liveCount: number;
   query: string;
   onQueryChange: (v: string) => void;
-  onGoPro: () => void;
 }) {
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-xl">
@@ -32,7 +31,7 @@ export function AppHeader({
         </div>
 
         <button
-          onClick={onGoPro}
+          onClick={openPaystackCheckout}
           className="rounded-full bg-neon px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-neon/90"
         >
           Go Pro

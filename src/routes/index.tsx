@@ -65,7 +65,6 @@ function Index() {
         liveCount={data.liveCount}
         query={query}
         onQueryChange={setQuery}
-        onGoPro={() => setPricingOpen(true)}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
@@ -89,7 +88,7 @@ function Index() {
 
         {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
         {tab === "H2H Comparison" && <H2HTab />}
-        {tab === "Value Bets / Analytics" && <ValueBetsTab onGoPro={() => setPricingOpen(true)} />}
+        {tab === "Value Bets / Analytics" && <ValueBetsTab />}
       </main>
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
