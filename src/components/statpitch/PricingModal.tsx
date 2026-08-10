@@ -1,5 +1,6 @@
 import { Check, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { openPaystackCheckout } from "@/lib/utils";
 
 const free = ["Fixtures & trend cards", "Basic H2H comparison", "Over/Under 2.5 stats", "3 value spots per day"];
 const pro = [
@@ -56,7 +57,10 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
                 </li>
               ))}
             </ul>
-            <button className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90">
+            <button
+              onClick={openPaystackCheckout}
+              className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
+            >
               Go Pro
             </button>
           </div>
