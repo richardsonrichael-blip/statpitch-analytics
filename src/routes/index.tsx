@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
 import { HeroMatch } from "@/components/statpitch/HeroMatch";
@@ -7,13 +7,7 @@ import { FixturesTab } from "@/components/statpitch/FixturesTab";
 import { H2HTab } from "@/components/statpitch/H2HTab";
 import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
-import { getMatches } from "@/lib/matches.functions";
-
-const matchesQueryOptions = queryOptions({
-  queryKey: ["matches"],
-  queryFn: () => getMatches(),
-  staleTime: 60_000,
-});
+import { matchesQueryOptions } from "@/lib/matches.query";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -65,6 +59,7 @@ function Index() {
         liveCount={data.liveCount}
         query={query}
         onQueryChange={setQuery}
+        fixtures={data.fixtures}
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
