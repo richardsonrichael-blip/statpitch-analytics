@@ -18,7 +18,9 @@ export function AppHeader({
   fixtures: LiveFixture[];
 }) {
   const [open, setOpen] = useState(false);
+  const [upsell, setUpsell] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  const { user, isPro } = useProAccess();
 
   const results = useMemo(() => searchTeams(fixtures, query), [fixtures, query]);
 
