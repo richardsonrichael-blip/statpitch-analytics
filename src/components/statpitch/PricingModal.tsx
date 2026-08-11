@@ -1,6 +1,8 @@
 import { Check, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { openPaystackCheckout } from "@/lib/utils";
+import { useProAccess } from "@/hooks/useProAccess";
 
 const free = ["Fixtures & trend cards", "Basic H2H comparison", "Over/Under 2.5 stats", "3 value spots per day"];
 const pro = [
