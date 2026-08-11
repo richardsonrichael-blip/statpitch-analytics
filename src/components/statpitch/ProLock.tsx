@@ -89,7 +89,7 @@ export function ProLock({
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-3xl">
+      <div className="relative min-h-[210px] overflow-hidden rounded-3xl">
         <div aria-hidden className="pointer-events-none select-none blur-[7px] saturate-50">
           {children}
         </div>
