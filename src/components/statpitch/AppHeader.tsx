@@ -52,12 +52,40 @@ export function AppHeader({
           <span className="text-xs font-semibold tabular-nums">{liveCount} Live</span>
         </div>
 
-        <button
-          onClick={openPaystackCheckout}
-          className="rounded-full bg-neon px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-neon/90"
-        >
-          Go Pro
-        </button>
+        {isPro ? (
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 rounded-full border border-neon/40 bg-neon/12 px-3.5 py-2 text-xs font-bold text-neon"
+          >
+            <BadgeCheck className="size-4" /> Pro
+          </Link>
+        ) : (
+          <button
+            onClick={() => setUpsell(true)}
+            className="rounded-full bg-neon px-4 py-2 text-xs font-bold text-primary-foreground transition hover:bg-neon/90"
+          >
+            Go Pro
+          </button>
+        )}
+
+        {user ? (
+          !isPro && (
+            <Link
+              to="/dashboard"
+              className="rounded-full border border-input px-3.5 py-2 text-xs font-semibold transition hover:bg-accent"
+            >
+              Account
+            </Link>
+          )
+        ) : (
+          <Link
+            to="/auth"
+            search={{ redirect: "/dashboard" }}
+            className="rounded-full border border-input px-3.5 py-2 text-xs font-semibold transition hover:bg-accent"
+          >
+            Sign in
+          </Link>
+        )}
 
         <div ref={boxRef} className="relative order-last w-full sm:order-none sm:w-72">
           <label className="flex w-full items-center gap-2 rounded-xl border border-input bg-surface px-3 py-2 focus-within:border-neon/50">
