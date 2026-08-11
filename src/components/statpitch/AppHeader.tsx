@@ -137,6 +137,7 @@ export function AppHeader({
           )}
         </div>
       </div>
+      <ProUpsellModal open={upsell} onOpenChange={setUpsell} signedIn={Boolean(user)} />
     </header>
   );
 }
