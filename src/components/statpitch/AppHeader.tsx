@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Zap } from "lucide-react";
+import { BadgeCheck, Search, Zap } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { openPaystackCheckout } from "@/lib/utils";
 import type { LiveFixture } from "@/data/mock-live";
 import { searchTeams } from "@/lib/team-directory";
+import { useProAccess } from "@/hooks/useProAccess";
+import { ProUpsellModal } from "@/components/statpitch/ProLock";
 
 export function AppHeader({
   liveCount,
