@@ -60,12 +60,27 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
                 </li>
               ))}
             </ul>
-            <button
-              onClick={openPaystackCheckout}
-              className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
-            >
-              Go Pro
-            </button>
+            {isPro ? (
+              <p className="mt-5 w-full rounded-xl border border-neon/40 bg-neon/12 py-2.5 text-center text-sm font-bold text-neon">
+                Pro is active on your account
+              </p>
+            ) : user ? (
+              <button
+                onClick={openPaystackCheckout}
+                className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
+              >
+                Go Pro
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                search={{ redirect: "/dashboard" }}
+                onClick={() => onOpenChange(false)}
+                className="mt-5 block w-full rounded-xl bg-neon py-2.5 text-center text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
+              >
+                Sign in to go Pro
+              </Link>
+            )}
           </div>
         </div>
       </DialogContent>
