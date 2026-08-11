@@ -1,4 +1,5 @@
 import { matchOfTheDay as m } from "@/data/football";
+import { ProLock } from "@/components/statpitch/ProLock";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
   return (
