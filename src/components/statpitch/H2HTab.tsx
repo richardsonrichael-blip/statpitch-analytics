@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { teams } from "@/data/football";
+import { ProLock } from "@/components/statpitch/ProLock";
 
-const metrics = [
+const freeMetrics = [
   { key: "goalsScored", label: "Goals Scored", max: 60, suffix: "" },
   { key: "possession", label: "Possession", max: 100, suffix: "%" },
+] as const;
+
+const proMetrics = [
   { key: "cleanSheets", label: "Clean Sheets", max: 20, suffix: "" },
   { key: "avgCorners", label: "Avg Corners", max: 10, suffix: "" },
 ] as const;
+
+type Metric = (typeof freeMetrics)[number] | (typeof proMetrics)[number];
+type Team = (typeof teams)[string];
 
 function TeamSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
@@ -21,6 +28,34 @@ function TeamSelect({ value, onChange }: { value: string; onChange: (v: string) 
         </option>
       ))}
     </select>
+  );
+}
+
+function MetricRow({ metric, a, b }: { metric: Metric; a: Team; b: Team }) {
+  const av = a[metric.key] as number;
+  const bv = b[metric.key] as number;
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between text-xs">
+        <span className="font-bold tabular-nums">
+          {av}
+          {metric.suffix}
+        </span>
+        <span className="uppercase tracking-widest text-muted-foreground">{metric.label}</span>
+        <span className="font-bold tabular-nums">
+          {bv}
+          {metric.suffix}
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex h-2 flex-1 justify-end overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-neon" style={{ width: `${(av / metric.max) * 100}%` }} />
+        </div>
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-neon-dim" style={{ width: `${(bv / metric.max) * 100}%` }} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -60,33 +95,27 @@ export function H2HTab() {
       </div>
 
       <div className="mt-6 space-y-5">
-        {metrics.map((m) => {
-          const av = a[m.key] as number;
-          const bv = b[m.key] as number;
-          return (
-            <div key={m.key}>
-              <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="font-bold tabular-nums">
-                  {av}
-                  {m.suffix}
-                </span>
-                <span className="uppercase tracking-widest text-muted-foreground">{m.label}</span>
-                <span className="font-bold tabular-nums">
-                  {bv}
-                  {m.suffix}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex h-2 flex-1 justify-end overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-neon" style={{ width: `${(av / m.max) * 100}%` }} />
-                </div>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-neon-dim" style={{ width: `${(bv / m.max) * 100}%` }} />
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {freeMetrics.map((m) => (
+          <MetricRow key={m.key} metric={m} a={a} b={b} />
+        ))}
+      </div>
+
+      <div className="mt-6">
+        <ProLock feature="Corner & card stat models" cta="Unlock">
+          <div className="space-y-5 rounded-2xl border border-border bg-background p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Deep comparison
+            </p>
+            {proMetrics.map((m) => (
+              <MetricRow key={m.key} metric={m} a={a} b={b} />
+            ))}
+            <MetricRow
+              metric={{ key: "avgCorners", label: "Corner model edge", max: 10, suffix: "" }}
+              a={a}
+              b={b}
+            />
+          </div>
+        </ProLock>
       </div>
     </div>
   );
