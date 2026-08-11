@@ -12,7 +12,7 @@ const proMetrics = [
   { key: "avgCorners", label: "Avg Corners", max: 10, suffix: "" },
 ] as const;
 
-type Metric = (typeof freeMetrics)[number] | (typeof proMetrics)[number];
+type Metric = { key: "goalsScored" | "possession" | "cleanSheets" | "avgCorners"; label: string; max: number; suffix: string };
 type Team = (typeof teams)[string];
 
 function TeamSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
