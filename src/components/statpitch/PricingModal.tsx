@@ -14,6 +14,7 @@ const pro = [
 ];
 
 export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const { user, isPro } = useProAccess();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl border-border bg-popover">
