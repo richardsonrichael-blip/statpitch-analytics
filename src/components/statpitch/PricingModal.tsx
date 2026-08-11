@@ -1,6 +1,8 @@
 import { Check, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { openPaystackCheckout } from "@/lib/utils";
+import { useProAccess } from "@/hooks/useProAccess";
 
 const free = ["Fixtures & trend cards", "Basic H2H comparison", "Over/Under 2.5 stats", "3 value spots per day"];
 const pro = [
@@ -12,6 +14,7 @@ const pro = [
 ];
 
 export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const { user, isPro } = useProAccess();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl border-border bg-popover">
@@ -57,12 +60,27 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
                 </li>
               ))}
             </ul>
-            <button
-              onClick={openPaystackCheckout}
-              className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
-            >
-              Go Pro
-            </button>
+            {isPro ? (
+              <p className="mt-5 w-full rounded-xl border border-neon/40 bg-neon/12 py-2.5 text-center text-sm font-bold text-neon">
+                Pro is active on your account
+              </p>
+            ) : user ? (
+              <button
+                onClick={openPaystackCheckout}
+                className="mt-5 w-full rounded-xl bg-neon py-2.5 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
+              >
+                Go Pro
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                search={{ redirect: "/dashboard" }}
+                onClick={() => onOpenChange(false)}
+                className="mt-5 block w-full rounded-xl bg-neon py-2.5 text-center text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
+              >
+                Sign in to go Pro
+              </Link>
+            )}
           </div>
         </div>
       </DialogContent>

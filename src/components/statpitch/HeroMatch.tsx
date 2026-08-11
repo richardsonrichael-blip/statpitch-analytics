@@ -1,4 +1,5 @@
 import { matchOfTheDay as m } from "@/data/football";
+import { ProLock } from "@/components/statpitch/ProLock";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
   return (
@@ -89,6 +90,30 @@ export function HeroMatch() {
             <Bar label="Both teams to score" value={m.overUnder.bttsPct} />
           </div>
         </div>
+      </div>
+      <div className="mt-4">
+        <ProLock feature="AI match prediction" cta="Unlock">
+          <div className="grid gap-4 rounded-2xl border border-border bg-surface/70 p-4 sm:grid-cols-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Predicted scoreline
+              </p>
+              <p className="mt-1 text-2xl font-bold text-neon tabular-nums">2 - 1</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Model pick
+              </p>
+              <p className="mt-1 text-2xl font-bold">{m.home} & Over 2.5</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Corners / cards
+              </p>
+              <p className="mt-1 text-2xl font-bold tabular-nums">10.4 / 4.2</p>
+            </div>
+          </div>
+        </ProLock>
       </div>
     </section>
   );
