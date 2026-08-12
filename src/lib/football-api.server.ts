@@ -80,7 +80,16 @@ export async function fetchMatches(): Promise<MatchesPayload> {
     const matches = json.matches ?? [];
     if (matches.length === 0) return buildMockMatches();
 
-    const fixtures = matches.slice(0, 24).map(mapMatch);
+    // Stable ordering so SSR markup and client refetches agree (avoids hydration mismatch).
+    const fixtures = [...matches]
+      .sort((a, b) => {
+        const at = new Date(a.utcDate ?? 0).getTime();
+        const bt = new Date(b.utcDate ?? 0).getTime();
+        if (at !== bt) return at - bt;
+        return String(a.id).localeCompare(String(b.id));
+      })
+      .slice(0, 24)
+      .map(mapMatch);
     return {
       source: "live",
       liveCount: fixtures.filter((f) => LIVE_STATUSES.has(f.status)).length,
