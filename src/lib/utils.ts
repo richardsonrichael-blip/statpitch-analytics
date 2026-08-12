@@ -8,5 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 export const PAYSTACK_CHECKOUT_URL = "https://paystack.shop/pay/z-p-3bdwv5";
 
 export function openPaystackCheckout() {
-  window.open(PAYSTACK_CHECKOUT_URL, "_blank", "noopener,noreferrer");
+  // Paystack sends the payer back here; ?payment=success unlocks Pro locally.
+  const callback = `${window.location.origin}/?payment=success`;
+  const url = `${PAYSTACK_CHECKOUT_URL}?callback_url=${encodeURIComponent(callback)}`;
+  window.open(url, "_blank", "noopener,noreferrer");
 }

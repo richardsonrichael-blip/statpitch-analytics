@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getProStatus } from "@/lib/pro.functions";
+import { consumePaymentSuccessParam, readLocalPro } from "@/lib/local-pro";
 
 export function useAuthSession() {
   const [session, setSession] = useState<Session | null>(null);
@@ -31,9 +32,28 @@ export function useAuthSession() {
   return { session, user: (session?.user ?? null) as User | null, loading };
 }
 
+export function useLocalPro() {
+  const [localPro, setLocalPro] = useState(false);
+
+  useEffect(() => {
+    consumePaymentSuccessParam();
+    const sync = () => setLocalPro(readLocalPro());
+    sync();
+    window.addEventListener("statpitch:pro-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("statpitch:pro-change", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  return localPro;
+}
+
 export function useProAccess() {
   const { user, loading } = useAuthSession();
   const fetchStatus = useServerFn(getProStatus);
+  const localPro = useLocalPro();
 
   const query = useQuery({
     queryKey: ["pro-status", user?.id ?? "anon"],
@@ -44,7 +64,7 @@ export function useProAccess() {
 
   return {
     user,
-    isPro: Boolean(query.data?.isPro),
+    isPro: Boolean(query.data?.isPro) || localPro,
     proSince: query.data?.proSince ?? null,
     loading: loading || (Boolean(user) && query.isLoading),
   };
