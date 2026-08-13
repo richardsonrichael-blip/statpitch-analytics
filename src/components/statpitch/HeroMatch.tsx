@@ -96,6 +96,12 @@ export function HeroMatch() {
             <Bar label="Under 2.5" value={m.overUnder.under} tone="muted" />
             <Bar label="Both teams to score" value={m.overUnder.bttsPct} />
           </div>
+          <OddsBoard
+            probability={m.overUnder.over}
+            seed="motd-over25"
+            selection={`${m.home} vs ${m.away} · Over 2.5 Goals`}
+            label="Over 2.5 Goals"
+          />
         </div>
       </div>
       <div className="mt-4">
