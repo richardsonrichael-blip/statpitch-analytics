@@ -54,6 +54,12 @@ export function HeroMatch() {
             <Bar label="Draw" value={m.probabilities.draw} tone="muted" />
             <Bar label={m.away} value={m.probabilities.away} tone="muted" />
           </div>
+          <OddsBoard
+            probability={m.probabilities.home}
+            seed="motd-home"
+            selection={`${m.home} vs ${m.away} · ${m.home} to win`}
+            label={`${m.home} to win`}
+          />
         </div>
 
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
