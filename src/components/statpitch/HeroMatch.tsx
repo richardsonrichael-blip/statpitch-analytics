@@ -1,5 +1,6 @@
 import { matchOfTheDay as m } from "@/data/football";
 import { ProLock } from "@/components/statpitch/ProLock";
+import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
   return (
@@ -53,6 +54,12 @@ export function HeroMatch() {
             <Bar label="Draw" value={m.probabilities.draw} tone="muted" />
             <Bar label={m.away} value={m.probabilities.away} tone="muted" />
           </div>
+          <OddsBoard
+            probability={m.probabilities.home}
+            seed="motd-home"
+            selection={`${m.home} vs ${m.away} · ${m.home} to win`}
+            label={`${m.home} to win`}
+          />
         </div>
 
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
@@ -89,6 +96,12 @@ export function HeroMatch() {
             <Bar label="Under 2.5" value={m.overUnder.under} tone="muted" />
             <Bar label="Both teams to score" value={m.overUnder.bttsPct} />
           </div>
+          <OddsBoard
+            probability={m.overUnder.over}
+            seed="motd-over25"
+            selection={`${m.home} vs ${m.away} · Over 2.5 Goals`}
+            label="Over 2.5 Goals"
+          />
         </div>
       </div>
       <div className="mt-4">

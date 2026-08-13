@@ -1,4 +1,5 @@
 import type { LiveFixture } from "@/data/mock-live";
+import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
 const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE"];
 
@@ -81,6 +82,13 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               <span>X · {f.draw}%</span>
               <span>2 · {f.awayWin}%</span>
             </div>
+
+            <OddsBoard
+              probability={f.homeWin}
+              seed={f.id}
+              selection={`${f.home} vs ${f.away} · ${f.home} to win`}
+              label={`${f.home} to win`}
+            />
           </article>
         );
       })}

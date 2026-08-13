@@ -24,14 +24,15 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       ],
     };
   },
-  validateSearch: (search: Record<string, unknown>) => ({
-    reference:
+  validateSearch: (search: Record<string, unknown>): { reference?: string } => {
+    const reference =
       typeof search["reference"] === "string"
         ? search["reference"]
         : typeof search["trxref"] === "string"
           ? search["trxref"]
-          : undefined,
-  }),
+          : undefined;
+    return reference ? { reference } : {};
+  },
   component: AccountPage,
 });
 

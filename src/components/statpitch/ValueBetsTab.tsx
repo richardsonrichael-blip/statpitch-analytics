@@ -1,6 +1,19 @@
-import { valueBets } from "@/data/football";
+import { useMemo, useState } from "react";
+import { Flame } from "lucide-react";
 import { ProLock } from "@/components/statpitch/ProLock";
 import { useProAccess } from "@/hooks/useProAccess";
+import { useOddsFormat } from "@/hooks/useOddsFormat";
+import { bestPrice, betLink, bookmakerPrices, formatOdds } from "@/lib/odds";
+import {
+  LEAGUE_FILTERS,
+  STAT_FILTERS,
+  edgeOf,
+  isHighValue,
+  valueSpots,
+  type LeagueGroup,
+  type StatMarket,
+  type ValueSpot,
+} from "@/data/value-bets";
 
 const FREE_ROWS = 3;
 
@@ -13,48 +26,81 @@ function Head() {
         <th className="px-3 py-3 font-semibold">Model</th>
         <th className="px-3 py-3 font-semibold">Implied</th>
         <th className="px-3 py-3 font-semibold">Edge</th>
-        <th className="px-5 py-3 font-semibold">Confidence</th>
+        <th className="px-3 py-3 font-semibold">Best odds</th>
+        <th className="px-5 py-3 font-semibold">Bet</th>
       </tr>
     </thead>
   );
 }
 
-function Rows({ rows }: { rows: typeof valueBets }) {
+function Rows({ rows }: { rows: ValueSpot[] }) {
+  const { format } = useOddsFormat();
+
   return (
     <tbody>
-      {rows.map((v) => (
-        <tr key={v.match + v.market} className="border-t border-border/70">
-          <td className="px-5 py-3.5">
-            <p className="font-semibold">{v.match}</p>
-            <p className="text-[11px] text-muted-foreground">{v.league}</p>
-          </td>
-          <td className="px-3 py-3.5 text-muted-foreground">{v.market}</td>
-          <td className="px-3 py-3.5 font-bold tabular-nums">{v.model}%</td>
-          <td className="px-3 py-3.5 tabular-nums text-muted-foreground">{v.implied}%</td>
-          <td className="px-3 py-3.5 font-bold text-neon tabular-nums">+{v.edge}%</td>
-          <td className="px-5 py-3.5">
-            <span
-              className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                v.confidence === "High"
-                  ? "bg-neon/15 text-neon"
-                  : v.confidence === "Medium"
-                    ? "bg-warn/15 text-warn"
-                    : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {v.confidence}
-            </span>
-          </td>
-        </tr>
-      ))}
+      {rows.map((v) => {
+        const prices = bookmakerPrices(v.model, v.match + v.market);
+        const best = bestPrice(prices);
+        const selection = `${v.match} · ${v.market}`;
+        return (
+          <tr key={v.match + v.market} className="border-t border-border/70">
+            <td className="px-5 py-3.5">
+              <p className="flex flex-wrap items-center gap-2 font-semibold">
+                {v.match}
+                {isHighValue(v) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-bold text-neon">
+                    <Flame className="size-3" /> High Value Alert
+                  </span>
+                )}
+              </p>
+              <p className="text-[11px] text-muted-foreground">{v.leagueGroup}</p>
+            </td>
+            <td className="px-3 py-3.5 text-muted-foreground">{v.market}</td>
+            <td className="px-3 py-3.5 font-bold tabular-nums">{v.model}%</td>
+            <td className="px-3 py-3.5 tabular-nums text-muted-foreground">{v.implied}%</td>
+            <td className="px-3 py-3.5 font-bold text-neon tabular-nums">+{edgeOf(v)}%</td>
+            <td className="px-3 py-3.5">
+              <p className="font-bold tabular-nums">{formatOdds(best.decimal, format)}</p>
+              <p className="text-[11px] text-muted-foreground">{best.bookmaker.name}</p>
+            </td>
+            <td className="px-5 py-3.5">
+              <a
+                href={betLink(best.bookmaker, selection)}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="inline-block whitespace-nowrap rounded-full bg-neon px-3.5 py-1.5 text-[11px] font-bold text-primary-foreground transition hover:bg-neon/90"
+              >
+                Place Bet
+              </a>
+            </td>
+          </tr>
+        );
+      })}
     </tbody>
   );
 }
 
 export function ValueBetsTab() {
   const { isPro } = useProAccess();
-  const free = valueBets.slice(0, FREE_ROWS);
-  const locked = valueBets.slice(FREE_ROWS);
+  const [league, setLeague] = useState<LeagueGroup | "All">("All");
+  const [stats, setStats] = useState<StatMarket[]>([]);
+
+  const filtered = useMemo(
+    () =>
+      valueSpots.filter(
+        (v) =>
+          (league === "All" || v.leagueGroup === league) &&
+          (stats.length === 0 || (v.statMarket ? stats.includes(v.statMarket) : false)),
+      ),
+    [league, stats],
+  );
+
+  const free = filtered.slice(0, FREE_ROWS);
+  const locked = filtered.slice(FREE_ROWS);
+
+  function toggleStat(s: StatMarket) {
+    setStats((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+  }
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border bg-surface card-shadow">
@@ -74,18 +120,63 @@ export function ValueBetsTab() {
         )}
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-sm">
-          <Head />
-          <Rows rows={isPro ? valueBets : free} />
-        </table>
+      <div className="space-y-3 border-b border-border px-5 py-4">
+        <div className="flex gap-1.5 overflow-x-auto">
+          {(["All", ...LEAGUE_FILTERS.map((l) => l.id)] as const).map((id) => {
+            const label = id === "All" ? "All leagues" : LEAGUE_FILTERS.find((l) => l.id === id)!.label;
+            return (
+              <button
+                key={id}
+                onClick={() => setLeague(id)}
+                aria-pressed={league === id}
+                className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-[11px] font-bold transition ${
+                  league === id
+                    ? "bg-neon text-primary-foreground"
+                    : "border border-input text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {STAT_FILTERS.map((s) => (
+            <button
+              key={s}
+              onClick={() => toggleStat(s)}
+              aria-pressed={stats.includes(s)}
+              className={`rounded-full px-3 py-1.5 text-[11px] font-semibold transition ${
+                stats.includes(s)
+                  ? "border border-neon/50 bg-neon/12 text-neon"
+                  : "border border-input text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {filtered.length === 0 ? (
+        <p className="px-5 py-8 text-sm text-muted-foreground">
+          No value spots match these filters right now.
+        </p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[780px] text-sm">
+            <Head />
+            <Rows rows={isPro ? filtered : free} />
+          </table>
+        </div>
+      )}
 
       {!isPro && locked.length > 0 && (
         <div className="p-4">
           <ProLock feature="Full value bet table & edge alerts" cta="Unlock">
             <div className="overflow-x-auto rounded-2xl border border-border bg-background">
-              <table className="w-full min-w-[640px] text-sm">
+              <table className="w-full min-w-[780px] text-sm">
                 <Rows rows={locked} />
               </table>
             </div>
