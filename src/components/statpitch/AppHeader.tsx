@@ -5,6 +5,7 @@ import type { LiveFixture } from "@/data/mock-live";
 import { searchTeams } from "@/lib/team-directory";
 import { useProAccess } from "@/hooks/useProAccess";
 import { ProUpsellModal } from "@/components/statpitch/ProLock";
+import { OddsFormatToggle } from "@/components/statpitch/OddsPanel";
 
 export function AppHeader({
   liveCount,
