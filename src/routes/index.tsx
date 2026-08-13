@@ -7,6 +7,8 @@ import { FixturesTab } from "@/components/statpitch/FixturesTab";
 import { H2HTab } from "@/components/statpitch/H2HTab";
 import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
+import { TelegramBanner } from "@/components/statpitch/TelegramBanner";
+import { BetBuilder } from "@/components/statpitch/BetBuilder";
 import { matchesQueryOptions } from "@/lib/matches.query";
 
 export const Route = createFileRoute("/")({
@@ -37,7 +39,12 @@ export const Route = createFileRoute("/")({
   notFoundComponent: () => <p className="p-8 text-sm text-muted-foreground">No matches found.</p>,
 });
 
-const tabs = ["Fixtures & Trends", "H2H Comparison", "Value Bets / Analytics"] as const;
+const tabs = [
+  "Fixtures & Trends",
+  "H2H Comparison",
+  "Value Bets / Analytics",
+  "AI Bet Builder",
+] as const;
 
 function Index() {
   const { data } = useSuspenseQuery(matchesQueryOptions);
@@ -63,6 +70,8 @@ function Index() {
       />
 
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
+        <TelegramBanner onGoPro={() => setPricingOpen(true)} />
+
         <HeroMatch />
 
         <nav className="flex gap-1.5 overflow-x-auto rounded-full border border-border bg-surface p-1.5">
@@ -84,6 +93,7 @@ function Index() {
         {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
         {tab === "H2H Comparison" && <H2HTab />}
         {tab === "Value Bets / Analytics" && <ValueBetsTab />}
+        {tab === "AI Bet Builder" && <BetBuilder />}
       </main>
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
