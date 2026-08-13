@@ -1,4 +1,5 @@
 import type { LiveFixture } from "@/data/mock-live";
+import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
 const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE"];
 
