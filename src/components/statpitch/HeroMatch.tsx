@@ -1,5 +1,6 @@
 import { matchOfTheDay as m } from "@/data/football";
 import { ProLock } from "@/components/statpitch/ProLock";
+import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
   return (
