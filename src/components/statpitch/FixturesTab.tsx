@@ -82,6 +82,13 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               <span>X · {f.draw}%</span>
               <span>2 · {f.awayWin}%</span>
             </div>
+
+            <OddsBoard
+              probability={f.homeWin}
+              seed={f.id}
+              selection={`${f.home} vs ${f.away} · ${f.home} to win`}
+              label={`${f.home} to win`}
+            />
           </article>
         );
       })}
