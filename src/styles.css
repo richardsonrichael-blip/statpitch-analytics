@@ -35,48 +35,49 @@
   --color-neon: var(--neon);
   --color-neon-dim: var(--neon-dim);
   --color-warn: var(--warn);
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.75rem;
-  /* deep navy base */
-  --background: oklch(0.16 0.045 264);
-  --foreground: oklch(0.98 0.005 250);
-  --surface: oklch(0.21 0.045 264);
-  --surface-elevated: oklch(0.25 0.045 264);
-  --card: oklch(0.21 0.045 264);
-  --card-foreground: oklch(0.98 0.005 250);
-  --popover: oklch(0.19 0.045 264);
-  --popover-foreground: oklch(0.98 0.005 250);
-  /* neon green #00ff88 */
-  --neon: oklch(0.89 0.24 154);
-  --neon-dim: oklch(0.68 0.17 154);
-  --primary: oklch(0.89 0.24 154);
-  --primary-foreground: oklch(0.18 0.05 264);
-  --secondary: oklch(0.27 0.045 264);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.26 0.04 264);
-  --muted-foreground: oklch(0.72 0.03 258);
-  --accent: oklch(0.3 0.05 264);
-  --accent-foreground: oklch(0.98 0.005 250);
-  --destructive: oklch(0.62 0.23 22);
-  --destructive-foreground: oklch(0.98 0.005 250);
-  --warn: oklch(0.82 0.17 82);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 14%);
-  --ring: oklch(0.89 0.24 154 / 45%);
+  --radius: 0.9rem;
+  /* deep charcoal base #0d0c0a */
+  --background: oklch(0.145 0.007 70);
+  --foreground: oklch(0.972 0.008 80);
+  --surface: oklch(0.205 0.011 70);
+  --surface-elevated: oklch(0.25 0.013 70);
+  --card: oklch(0.205 0.011 70);
+  --card-foreground: oklch(0.972 0.008 80);
+  --popover: oklch(0.185 0.01 70);
+  --popover-foreground: oklch(0.972 0.008 80);
+  /* premium gold #e7b855 */
+  --neon: oklch(0.81 0.115 82);
+  --neon-dim: oklch(0.68 0.1 80);
+  --primary: oklch(0.81 0.115 82);
+  --primary-foreground: oklch(0.16 0.008 70);
+  --secondary: oklch(0.26 0.012 70);
+  --secondary-foreground: oklch(0.96 0.008 80);
+  --muted: oklch(0.25 0.01 70);
+  --muted-foreground: oklch(0.73 0.014 78);
+  --accent: oklch(0.29 0.015 72);
+  --accent-foreground: oklch(0.972 0.008 80);
+  --destructive: oklch(0.6 0.21 25);
+  --destructive-foreground: oklch(0.98 0.005 80);
+  --warn: oklch(0.82 0.15 70);
+  --border: oklch(0.81 0.115 82 / 12%);
+  --input: oklch(0.81 0.115 82 / 18%);
+  --ring: oklch(0.81 0.115 82 / 45%);
 
   --gradient-pitch: radial-gradient(
       120% 90% at 85% 0%,
-      color-mix(in oklab, var(--neon) 22%, transparent),
-      transparent 60%
+      color-mix(in oklab, var(--neon) 18%, transparent),
+      transparent 62%
     ),
     linear-gradient(160deg, var(--surface-elevated), var(--background));
+  --gradient-gold: linear-gradient(100deg, var(--neon), color-mix(in oklab, var(--neon) 65%, black));
   --shadow-neon: 0 0 0 1px color-mix(in oklab, var(--neon) 30%, transparent),
-    0 18px 45px -20px color-mix(in oklab, var(--neon) 45%, transparent);
-  --shadow-card: 0 20px 40px -28px oklch(0 0 0 / 70%);
+    0 18px 45px -20px color-mix(in oklab, var(--neon) 40%, transparent);
+  --shadow-card: 0 24px 50px -30px oklch(0 0 0 / 80%);
 }
 
 @layer base {
@@ -96,8 +97,9 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: 0.02em;
   }
+
 }
 
 @utility pitch-hero {
