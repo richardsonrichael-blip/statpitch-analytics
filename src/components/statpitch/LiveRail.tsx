@@ -2,13 +2,24 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { LiveFixture } from "@/data/mock-live";
 
+const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE"];
+
+function isLiveFixture(f: LiveFixture) {
+  return LIVE_STATUSES.includes(f.status);
+}
+
+function kickoffLabel(iso: string) {
+  return new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+}
+
 /** Compact live / upcoming fixture rail for the command-centre grid. */
 export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
   const [tab, setTab] = useState<"live" | "upcoming">("live");
 
-  const live = fixtures.filter((f) => f.isLive);
-  const upcoming = fixtures.filter((f) => !f.isLive);
+  const live = fixtures.filter(isLiveFixture);
+  const upcoming = fixtures.filter((f) => !isLiveFixture(f));
   const list = (tab === "live" ? (live.length ? live : upcoming) : upcoming).slice(0, 6);
+
 
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-surface card-shadow">
