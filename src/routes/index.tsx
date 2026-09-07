@@ -9,6 +9,8 @@ import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
 import { TelegramBanner } from "@/components/statpitch/TelegramBanner";
 import { BetBuilder } from "@/components/statpitch/BetBuilder";
+import { ProRail } from "@/components/statpitch/ProRail";
+import { LiveRail } from "@/components/statpitch/LiveRail";
 import { matchesQueryOptions } from "@/lib/matches.query";
 
 export const Route = createFileRoute("/")({
@@ -69,17 +71,25 @@ function Index() {
         fixtures={data.fixtures}
       />
 
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
         <TelegramBanner onGoPro={() => setPricingOpen(true)} />
 
-        <HeroMatch />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <HeroMatch />
+          </div>
+          <div className="space-y-6 lg:col-span-4">
+            <ProRail onSeeAll={() => setPricingOpen(true)} />
+            <LiveRail fixtures={data.fixtures} />
+          </div>
+        </div>
 
-        <nav className="flex gap-1.5 overflow-x-auto rounded-full border border-border bg-surface p-1.5">
+        <nav className="flex gap-1.5 overflow-x-auto rounded-xl border border-border bg-surface p-1.5">
           {tabs.map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition ${
+              className={`whitespace-nowrap rounded-lg px-4 py-2 text-[11px] font-bold uppercase tracking-wider transition ${
                 tab === t
                   ? "bg-neon text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -95,6 +105,7 @@ function Index() {
         {tab === "Value Bets / Analytics" && <ValueBetsTab />}
         {tab === "AI Bet Builder" && <BetBuilder />}
       </main>
+
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         StatPitch Analytics ·{" "}
