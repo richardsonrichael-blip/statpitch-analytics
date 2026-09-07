@@ -52,11 +52,11 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
             >
               <div className="flex items-center gap-3">
                 <span
-                  className={`w-10 text-[10px] font-bold uppercase ${
-                    f.isLive ? "text-neon" : "text-muted-foreground"
+                  className={`w-12 text-[10px] font-bold uppercase ${
+                    isLiveFixture(f) ? "text-neon" : "text-muted-foreground"
                   }`}
                 >
-                  {f.isLive ? f.statusLabel : f.kickoffLabel}
+                  {isLiveFixture(f) ? "Live" : kickoffLabel(f.utcDate)}
                 </span>
                 <div className="space-y-0.5 text-xs font-semibold">
                   <p>{f.home}</p>
@@ -65,8 +65,13 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
               </div>
               <div className="space-y-0.5 text-right">
                 <p className="text-xs font-bold tabular-nums">
-                  {f.score ?? <span className="text-muted-foreground">VS</span>}
+                  {f.homeScore !== null && f.awayScore !== null ? (
+                    `${f.homeScore} - ${f.awayScore}`
+                  ) : (
+                    <span className="text-muted-foreground">VS</span>
+                  )}
                 </p>
+
                 <p className="text-[10px] text-neon group-hover:underline">Analysis →</p>
               </div>
             </Link>
