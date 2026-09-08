@@ -35,7 +35,7 @@ export function AppHeader({
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3 sm:gap-4">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="grid size-9 place-items-center rounded-xl bg-neon/12 text-neon glow-ring">
             <Zap className="size-4.5" strokeWidth={2.5} />
