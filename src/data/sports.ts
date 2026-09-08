@@ -164,7 +164,7 @@ export function buildSportFixtures(sport: SportId, now = Date.now()): LiveFixtur
 /** Model-edge value spots per sport, reusing the football table for football. */
 export function sportValueSpots(sport: SportId): ValueSpot[] {
   if (sport === "football") return valueSpots;
-  const s = sportById(sport);
+  const s = sportById(sport)!;
   return PAIRINGS[sport].flatMap((p, i) => {
     const base = `${p.home} vs ${p.away}`;
     return s.markets.slice(0, 3).map((market, j) => {
