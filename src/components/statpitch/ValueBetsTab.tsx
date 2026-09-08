@@ -14,6 +14,8 @@ import {
   type StatMarket,
   type ValueSpot,
 } from "@/data/value-bets";
+import { sportById, sportValueSpots, type SportId } from "@/data/sports";
+
 
 const FREE_ROWS = 3;
 
@@ -80,20 +82,33 @@ function Rows({ rows }: { rows: ValueSpot[] }) {
   );
 }
 
-export function ValueBetsTab() {
+export function ValueBetsTab({ sport = "football" }: { sport?: SportId }) {
   const { isPro } = useProAccess();
   const [league, setLeague] = useState<LeagueGroup | "All">("All");
   const [stats, setStats] = useState<StatMarket[]>([]);
+  const meta = sportById(sport)!;
+
+  const leagueFilters = useMemo(
+    () =>
+      sport === "football"
+        ? LEAGUE_FILTERS
+        : meta.leagues.map((l) => ({ id: l, label: `${meta.emoji} ${l}` })),
+    [sport, meta],
+  );
+  const statFilters = sport === "football" ? STAT_FILTERS : meta.markets;
+  const spots = useMemo(() => sportValueSpots(sport), [sport]);
+
 
   const filtered = useMemo(
     () =>
-      valueSpots.filter(
+      spots.filter(
         (v) =>
           (league === "All" || v.leagueGroup === league) &&
           (stats.length === 0 || (v.statMarket ? stats.includes(v.statMarket) : false)),
       ),
-    [league, stats],
+    [league, stats, spots],
   );
+
 
   const free = filtered.slice(0, FREE_ROWS);
   const locked = filtered.slice(FREE_ROWS);
@@ -122,8 +137,8 @@ export function ValueBetsTab() {
 
       <div className="space-y-3 border-b border-border px-5 py-4">
         <div className="flex gap-1.5 overflow-x-auto">
-          {(["All", ...LEAGUE_FILTERS.map((l) => l.id)] as const).map((id) => {
-            const label = id === "All" ? "All leagues" : LEAGUE_FILTERS.find((l) => l.id === id)!.label;
+          {["All", ...leagueFilters.map((l) => l.id)].map((id) => {
+            const label = id === "All" ? "All leagues" : leagueFilters.find((l) => l.id === id)!.label;
             return (
               <button
                 key={id}
@@ -142,7 +157,8 @@ export function ValueBetsTab() {
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {STAT_FILTERS.map((s) => (
+          {statFilters.map((s) => (
+
             <button
               key={s}
               onClick={() => toggleStat(s)}

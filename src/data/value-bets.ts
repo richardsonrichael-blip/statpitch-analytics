@@ -1,12 +1,6 @@
-export type LeagueGroup =
-  | "Premier League"
-  | "UEFA Champions League"
-  | "La Liga"
-  | "Serie A"
-  | "Bundesliga"
-  | "African Leagues / CAF";
+export type LeagueGroup = string;
 
-export type StatMarket = "Over 2.5 Goals" | "BTTS" | "Corner Markets" | "Card Markets";
+export type StatMarket = string;
 
 export type ValueSpot = {
   match: string;
@@ -17,6 +11,7 @@ export type ValueSpot = {
   implied: number;
   confidence: "High" | "Medium" | "Low";
 };
+
 
 export const LEAGUE_FILTERS: { id: LeagueGroup; label: string }[] = [
   { id: "Premier League", label: "Premier League 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
