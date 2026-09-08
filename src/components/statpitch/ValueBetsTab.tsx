@@ -14,6 +14,8 @@ import {
   type StatMarket,
   type ValueSpot,
 } from "@/data/value-bets";
+import { sportById, sportValueSpots, type SportId } from "@/data/sports";
+
 
 const FREE_ROWS = 3;
 
