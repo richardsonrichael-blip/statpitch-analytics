@@ -137,8 +137,8 @@ export function ValueBetsTab({ sport = "football" }: { sport?: SportId }) {
 
       <div className="space-y-3 border-b border-border px-5 py-4">
         <div className="flex gap-1.5 overflow-x-auto">
-          {(["All", ...LEAGUE_FILTERS.map((l) => l.id)] as const).map((id) => {
-            const label = id === "All" ? "All leagues" : LEAGUE_FILTERS.find((l) => l.id === id)!.label;
+          {["All", ...leagueFilters.map((l) => l.id)].map((id) => {
+            const label = id === "All" ? "All leagues" : leagueFilters.find((l) => l.id === id)!.label;
             return (
               <button
                 key={id}
@@ -157,7 +157,8 @@ export function ValueBetsTab({ sport = "football" }: { sport?: SportId }) {
         </div>
 
         <div className="flex flex-wrap gap-1.5">
-          {STAT_FILTERS.map((s) => (
+          {statFilters.map((s) => (
+
             <button
               key={s}
               onClick={() => toggleStat(s)}
