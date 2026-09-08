@@ -74,14 +74,17 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
 
             <div className="mt-4 flex h-1.5 overflow-hidden rounded-full">
               <div className="bg-neon" style={{ width: `${f.homeWin}%` }} />
-              <div className="bg-muted-foreground/40" style={{ width: `${f.draw}%` }} />
+              {f.draw > 0 && (
+                <div className="bg-muted-foreground/40" style={{ width: `${f.draw}%` }} />
+              )}
               <div className="bg-neon-dim" style={{ width: `${f.awayWin}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-[11px] text-muted-foreground tabular-nums">
               <span>1 · {f.homeWin}%</span>
-              <span>X · {f.draw}%</span>
+              {f.draw > 0 && <span>X · {f.draw}%</span>}
               <span>2 · {f.awayWin}%</span>
             </div>
+
 
             <OddsBoard
               probability={f.homeWin}
