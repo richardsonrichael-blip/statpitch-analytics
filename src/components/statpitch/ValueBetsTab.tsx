@@ -98,10 +98,6 @@ export function ValueBetsTab({ sport = "football" }: { sport?: SportId }) {
   const statFilters = sport === "football" ? STAT_FILTERS : meta.markets;
   const spots = useMemo(() => sportValueSpots(sport), [sport]);
 
-  useMemo(() => {
-    setLeague("All");
-    setStats([]);
-  }, [sport]);
 
   const filtered = useMemo(
     () =>
