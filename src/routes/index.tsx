@@ -12,6 +12,8 @@ import { BetBuilder } from "@/components/statpitch/BetBuilder";
 import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
 import { matchesQueryOptions } from "@/lib/matches.query";
+import { SPORTS, buildSportFixtures, type SportId } from "@/data/sports";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -52,15 +54,21 @@ function Index() {
   const { data } = useSuspenseQuery(matchesQueryOptions);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<(typeof tabs)[number]>("Fixtures & Trends");
+  const [sport, setSport] = useState<SportId>("football");
   const [pricingOpen, setPricingOpen] = useState(false);
+
+  const sportFixtures = useMemo(
+    () => (sport === "football" ? data.fixtures : buildSportFixtures(sport)),
+    [sport, data.fixtures],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return data.fixtures;
-    return data.fixtures.filter((f) =>
+    if (!q) return sportFixtures;
+    return sportFixtures.filter((f) =>
       [f.home, f.away, f.league].some((v) => v.toLowerCase().includes(q)),
     );
-  }, [query, data.fixtures]);
+  }, [query, sportFixtures]);
 
   return (
     <div className="min-h-screen">
@@ -74,13 +82,34 @@ function Index() {
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
         <TelegramBanner onGoPro={() => setPricingOpen(true)} />
 
+        <nav
+          aria-label="Choose a sport"
+          className="flex gap-1.5 overflow-x-auto rounded-2xl border border-border bg-surface p-1.5"
+        >
+          {SPORTS.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSport(s.id)}
+              aria-pressed={sport === s.id}
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider transition ${
+                sport === s.id
+                  ? "bg-neon text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span aria-hidden>{s.emoji}</span>
+              {s.label}
+            </button>
+          ))}
+        </nav>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <HeroMatch />
           </div>
           <div className="space-y-6 lg:col-span-4">
             <ProRail onSeeAll={() => setPricingOpen(true)} />
-            <LiveRail fixtures={data.fixtures} />
+            <LiveRail fixtures={sportFixtures} />
           </div>
         </div>
 
@@ -102,8 +131,9 @@ function Index() {
 
         {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
         {tab === "H2H Comparison" && <H2HTab />}
-        {tab === "Value Bets / Analytics" && <ValueBetsTab />}
+        {tab === "Value Bets / Analytics" && <ValueBetsTab key={sport} sport={sport} />}
         {tab === "AI Bet Builder" && <BetBuilder />}
+
       </main>
 
 
