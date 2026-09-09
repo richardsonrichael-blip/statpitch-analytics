@@ -134,14 +134,27 @@ const PAIRINGS: Record<Exclude<SportId, "football">, Pairing[]> = {
   ],
 };
 
+/** Realistic in-play score ranges per sport: [base, spread]; null = no running score. */
+const SCORE_RANGE: Record<Exclude<SportId, "football">, [number, number] | null> = {
+  basketball: [78, 40],
+  tennis: [0, 2],
+  "american-football": [7, 24],
+  "ice-hockey": [0, 4],
+  cricket: [96, 90],
+  combat: null,
+};
+
 /** Deterministic mock fixtures for the non-football sports. */
 export function buildSportFixtures(sport: SportId, now = Date.now()): LiveFixture[] {
   if (sport === "football") return [];
   const pairs = PAIRINGS[sport];
+  const range = SCORE_RANGE[sport];
   return pairs.map((p, i) => {
     const seed = `${sport}-${p.home}-${p.away}`;
     const homeWin = 38 + Math.round(seededRatio(seed) * 26);
     const isLive = i === 0;
+    const score = (suffix: string) =>
+      !isLive || !range ? null : range[0] + Math.round(seededRatio(`${seed}-${suffix}`) * range[1]);
     return {
       id: seed,
       league: p.league,
@@ -151,8 +164,9 @@ export function buildSportFixtures(sport: SportId, now = Date.now()): LiveFixtur
       away: p.away,
       homeCrest: null,
       awayCrest: null,
-      homeScore: isLive ? Math.round(seededRatio(`${seed}-hs`) * 60) : null,
-      awayScore: isLive ? Math.round(seededRatio(`${seed}-as`) * 60) : null,
+      homeScore: score("hs"),
+      awayScore: score("as"),
+
       pills: p.pills,
       homeWin,
       draw: 0,
