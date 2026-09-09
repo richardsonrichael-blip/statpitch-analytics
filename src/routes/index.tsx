@@ -89,10 +89,8 @@ function Index() {
           {SPORTS.map((s) => (
             <button
               key={s.id}
-              onClick={() => {
-                console.log("sport click", s.id);
-                setSport(s.id);
-              }}
+              onClick={() => setSport(s.id)}
+
 
               aria-pressed={sport === s.id}
               className={`flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-[11px] font-bold uppercase tracking-wider transition ${
