@@ -1,5 +1,13 @@
 import { fixtures as staticFixtures } from "./football";
 
+/** Real bookmaker prices from the live odds feed. */
+export type BookPrice = {
+  name: string;
+  homeDecimal: number;
+  drawDecimal: number | null;
+  awayDecimal: number;
+};
+
 export type LiveFixture = {
   id: string;
   league: string;
