@@ -1,6 +1,8 @@
 import { ExternalLink } from "lucide-react";
 import { useOddsFormat } from "@/hooks/useOddsFormat";
+import type { BookPrice } from "@/data/mock-live";
 import {
+  BOOKMAKERS,
   ODDS_FORMATS,
   bestPrice,
   betLink,
@@ -37,50 +39,75 @@ export function OddsFormatToggle({ compact = false }: { compact?: boolean }) {
   );
 }
 
+type Side = "home" | "draw" | "away";
+
+function priceFor(book: BookPrice, side: Side) {
+  if (side === "home") return book.homeDecimal;
+  if (side === "away") return book.awayDecimal;
+  return book.drawDecimal;
+}
+
 /** Live bookmaker prices for a selection + affiliate "Place Bet at Best Odds" CTA. */
 export function OddsBoard({
   probability,
   seed,
   selection,
   label,
+  books,
+  side = "home",
 }: {
   probability: number;
   seed: string;
   selection: string;
   label?: string;
+  /** Real prices from the live odds feed; falls back to modelled prices when absent. */
+  books?: BookPrice[];
+  side?: Side;
 }) {
   const { format } = useOddsFormat();
-  const prices = bookmakerPrices(probability, seed);
-  const best = bestPrice(prices);
+
+  const live = (books ?? [])
+    .map((b) => ({ name: b.name, decimal: priceFor(b, side) }))
+    .filter((p): p is { name: string; decimal: number } => !!p.decimal && p.decimal > 1)
+    .slice(0, 4);
+
+  const rows =
+    live.length > 0
+      ? live
+      : bookmakerPrices(probability, seed).map((p) => ({
+          name: p.bookmaker.name,
+          decimal: p.decimal,
+        }));
+
+  const best = rows.reduce((b, p) => (p.decimal > b.decimal ? p : b), rows[0]!);
+  const affiliate = live.length > 0 ? BOOKMAKERS[0]! : bestPrice(bookmakerPrices(probability, seed)).bookmaker;
 
   return (
     <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Live odds · {label ?? selection}
+          {live.length > 0 ? "Live odds" : "Model odds"} · {label ?? selection}
         </p>
         <p className="text-[10px] text-muted-foreground">
-          Best: {best.bookmaker.name} {formatOdds(best.decimal, format)}
+          Best: {best.name} {formatOdds(best.decimal, format)}
         </p>
       </div>
 
       <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-        {prices.map((p) => {
-          const isBest = p.bookmaker.id === best.bookmaker.id;
+        {rows.map((p) => {
+          const isBest = p.name === best.name;
           return (
             <a
-              key={p.bookmaker.id}
-              href={betLink(p.bookmaker, selection)}
+              key={p.name}
+              href={betLink(affiliate, selection)}
               target="_blank"
               rel="noopener noreferrer sponsored"
               className={`flex flex-col rounded-xl border px-2.5 py-1.5 transition hover:border-neon/60 ${
                 isBest ? "border-neon/50 bg-neon/10" : "border-border bg-surface"
               }`}
             >
-              <span className="text-[10px] text-muted-foreground">{p.bookmaker.name}</span>
-              <span
-                className={`text-sm font-bold tabular-nums ${isBest ? "text-neon" : ""}`}
-              >
+              <span className="truncate text-[10px] text-muted-foreground">{p.name}</span>
+              <span className={`text-sm font-bold tabular-nums ${isBest ? "text-neon" : ""}`}>
                 {formatOdds(p.decimal, format)}
               </span>
             </a>
@@ -89,7 +116,7 @@ export function OddsBoard({
       </div>
 
       <a
-        href={betLink(best.bookmaker, selection)}
+        href={betLink(affiliate, selection)}
         target="_blank"
         rel="noopener noreferrer sponsored"
         className="mt-2.5 flex items-center justify-center gap-1.5 rounded-xl bg-neon px-4 py-2.5 text-xs font-bold text-primary-foreground transition hover:bg-neon/90"

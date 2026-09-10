@@ -1,4 +1,4 @@
-import { matchOfTheDay as m } from "@/data/football";
+import type { LiveFixture } from "@/data/mock-live";
 import { ProLock } from "@/components/statpitch/ProLock";
 import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
@@ -6,12 +6,16 @@ function Bar({ label, value, tone }: { label: string; value: number; tone?: "mut
   return (
     <div>
       <div className="mb-1 flex justify-between text-xs">
-        <span className="text-muted-foreground">{label}</span>
+        <span className="truncate text-muted-foreground">{label}</span>
         <span className="font-semibold tabular-nums">{value}%</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
         <div
-          className={tone === "muted" ? "h-full rounded-full bg-muted-foreground/60" : "h-full rounded-full bg-neon"}
+          className={
+            tone === "muted"
+              ? "h-full rounded-full bg-muted-foreground/60"
+              : "h-full rounded-full bg-neon"
+          }
           style={{ width: `${value}%` }}
         />
       </div>
@@ -19,111 +23,123 @@ function Bar({ label, value, tone }: { label: string; value: number; tone?: "mut
   );
 }
 
-export function HeroMatch() {
+function kickoffLabel(iso: string) {
+  return new Date(iso).toLocaleString(undefined, {
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Top match of the current sport, priced from the live odds feed. */
+export function HeroMatch({ fixture }: { fixture?: LiveFixture }) {
+  if (!fixture) {
+    return (
+      <section className="pitch-hero rounded-3xl border border-border p-7 card-shadow">
+        <span className="stat-pill">Match of the Day</span>
+        <p className="mt-4 text-sm text-muted-foreground">
+          No priced matches in this sport right now — check another sport or come back closer to
+          kick-off.
+        </p>
+      </section>
+    );
+  }
+
+  const isLive = fixture.status === "IN_PLAY";
+  const bookCount = fixture.books?.length ?? 0;
+  const favourite = fixture.homeWin >= fixture.awayWin ? fixture.home : fixture.away;
+  const favouriteProb = Math.max(fixture.homeWin, fixture.awayWin);
+
   return (
     <section className="pitch-hero relative overflow-hidden rounded-3xl border border-border p-5 card-shadow sm:p-7">
       <div className="flex flex-wrap items-center gap-3">
         <span className="stat-pill">Match of the Day</span>
         <span className="text-xs text-muted-foreground">
-          {m.league} · {m.kickoff}
+          {fixture.league} · {isLive ? "In play now" : kickoffLabel(fixture.utcDate)}
         </span>
       </div>
 
       <div className="mt-5 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold sm:text-4xl">
-            {m.home} <span className="text-muted-foreground">vs</span> {m.away}
+            {fixture.home} <span className="text-muted-foreground">vs</span> {fixture.away}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Live {m.minute}' · Score {m.score} · Avg goals {m.overUnder.avgGoals}
+            {fixture.homeScore !== null && fixture.awayScore !== null
+              ? `Score ${fixture.homeScore} - ${fixture.awayScore} · `
+              : ""}
+            {bookCount > 0 ? `${bookCount} bookmakers priced` : "Market forming"} · Market
+            favourite {favourite}
           </p>
         </div>
         <div className="hidden text-right sm:block">
-          <p className="text-4xl font-bold text-neon tabular-nums">{m.overUnder.over}%</p>
-          <p className="text-xs text-muted-foreground">Over 2.5 probability</p>
+          <p className="text-4xl font-bold text-neon tabular-nums">{favouriteProb}%</p>
+          <p className="text-xs text-muted-foreground">Win probability</p>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Live probabilities
+            Market probabilities
           </p>
           <div className="space-y-2.5">
-            <Bar label={m.home} value={m.probabilities.home} />
-            <Bar label="Draw" value={m.probabilities.draw} tone="muted" />
-            <Bar label={m.away} value={m.probabilities.away} tone="muted" />
+            <Bar label={fixture.home} value={fixture.homeWin} />
+            {fixture.draw > 0 && <Bar label="Draw" value={fixture.draw} tone="muted" />}
+            <Bar label={fixture.away} value={fixture.awayWin} tone="muted" />
           </div>
           <OddsBoard
-            probability={m.probabilities.home}
-            seed="motd-home"
-            selection={`${m.home} vs ${m.away} · ${m.home} to win`}
-            label={`${m.home} to win`}
+            probability={fixture.homeWin}
+            seed={`${fixture.id}-home`}
+            books={fixture.books}
+            side="home"
+            selection={`${fixture.home} vs ${fixture.away} · ${fixture.home} to win`}
+            label={`${fixture.home} to win`}
           />
         </div>
 
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Head-to-Head ({m.h2h.played})
+            Other side of the market
           </p>
-          <div className="flex h-2 overflow-hidden rounded-full">
-            <div className="bg-neon" style={{ width: `${m.h2h.home}%` }} />
-            <div className="bg-muted-foreground/50" style={{ width: `${m.h2h.draw}%` }} />
-            <div className="bg-neon-dim" style={{ width: `${m.h2h.away}%` }} />
-          </div>
-          <div className="mt-4 grid grid-cols-3 text-center text-sm">
-            <div>
-              <p className="font-bold text-neon tabular-nums">{m.h2h.home}%</p>
-              <p className="text-[11px] text-muted-foreground">Home wins</p>
-            </div>
-            <div>
-              <p className="font-bold tabular-nums">{m.h2h.draw}%</p>
-              <p className="text-[11px] text-muted-foreground">Draws</p>
-            </div>
-            <div>
-              <p className="font-bold tabular-nums">{m.h2h.away}%</p>
-              <p className="text-[11px] text-muted-foreground">Away wins</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-border bg-surface/70 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Over / Under 2.5
-          </p>
-          <div className="space-y-2.5">
-            <Bar label="Over 2.5" value={m.overUnder.over} />
-            <Bar label="Under 2.5" value={m.overUnder.under} tone="muted" />
-            <Bar label="Both teams to score" value={m.overUnder.bttsPct} />
+          <div className="flex flex-wrap gap-2">
+            {fixture.pills.map((p) => (
+              <span key={p} className="stat-pill">
+                {p}
+              </span>
+            ))}
           </div>
           <OddsBoard
-            probability={m.overUnder.over}
-            seed="motd-over25"
-            selection={`${m.home} vs ${m.away} · Over 2.5 Goals`}
-            label="Over 2.5 Goals"
+            probability={fixture.awayWin}
+            seed={`${fixture.id}-away`}
+            books={fixture.books}
+            side="away"
+            selection={`${fixture.home} vs ${fixture.away} · ${fixture.away} to win`}
+            label={`${fixture.away} to win`}
           />
         </div>
       </div>
+
       <div className="mt-4">
         <ProLock feature="AI match prediction" cta="Unlock">
           <div className="grid gap-4 rounded-2xl border border-border bg-surface/70 p-4 sm:grid-cols-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Predicted scoreline
-              </p>
-              <p className="mt-1 text-2xl font-bold text-neon tabular-nums">2 - 1</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Model pick
               </p>
-              <p className="mt-1 text-2xl font-bold">{m.home} & Over 2.5</p>
+              <p className="mt-1 text-2xl font-bold">{favourite}</p>
             </div>
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Corners / cards
+                Model confidence
               </p>
-              <p className="mt-1 text-2xl font-bold tabular-nums">10.4 / 4.2</p>
+              <p className="mt-1 text-2xl font-bold text-neon tabular-nums">{favouriteProb}%</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Books priced
+              </p>
+              <p className="mt-1 text-2xl font-bold tabular-nums">{bookCount}</p>
             </div>
           </div>
         </ProLock>

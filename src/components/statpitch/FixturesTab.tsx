@@ -89,6 +89,8 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
             <OddsBoard
               probability={f.homeWin}
               seed={f.id}
+              books={f.books}
+              side="home"
               selection={`${f.home} vs ${f.away} · ${f.home} to win`}
               label={`${f.home} to win`}
             />
