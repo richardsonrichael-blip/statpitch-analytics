@@ -1,3 +1,5 @@
+import type { LiveFixture } from "./mock-live";
+
 export type LeagueGroup = string;
 
 export type StatMarket = string;
@@ -12,147 +14,43 @@ export type ValueSpot = {
   confidence: "High" | "Medium" | "Low";
 };
 
+/** Outcome markets available from the live h2h feed. */
+export const OUTCOME_FILTERS: StatMarket[] = ["Home Win", "Draw", "Away Win"];
 
-export const LEAGUE_FILTERS: { id: LeagueGroup; label: string }[] = [
-  { id: "Premier League", label: "Premier League 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
-  { id: "UEFA Champions League", label: "UEFA Champions League 🇪🇺" },
-  { id: "La Liga", label: "La Liga 🇪🇸" },
-  { id: "Serie A", label: "Serie A 🇮🇹" },
-  { id: "Bundesliga", label: "Bundesliga 🇩🇪" },
-  { id: "African Leagues / CAF", label: "African Leagues / CAF 🌍" },
-];
+function toSpot(
+  fixture: LiveFixture,
+  market: StatMarket,
+  model: number,
+  prices: (number | null)[],
+): ValueSpot | null {
+  const valid = prices.filter((p): p is number => !!p && p > 1);
+  if (valid.length === 0) return null;
+  const best = Math.max(...valid);
+  const implied = Math.round((100 / best) * 10) / 10;
+  const edge = model - implied;
+  return {
+    match: `${fixture.home} vs ${fixture.away}`,
+    leagueGroup: fixture.league,
+    market,
+    statMarket: market,
+    model,
+    implied,
+    confidence: edge >= 15 ? "High" : edge >= 6 ? "Medium" : "Low",
+  };
+}
 
-export const STAT_FILTERS: StatMarket[] = [
-  "Over 2.5 Goals",
-  "BTTS",
-  "Corner Markets",
-  "Card Markets",
-];
-
-export const valueSpots: ValueSpot[] = [
-  {
-    match: "Arsenal vs Brighton",
-    leagueGroup: "Premier League",
-    market: "Over 2.5 Goals",
-    statMarket: "Over 2.5 Goals",
-    model: 74,
-    implied: 58,
-    confidence: "High",
-  },
-  {
-    match: "Aston Villa vs Everton",
-    leagueGroup: "Premier League",
-    market: "Over 9.5 Corners",
-    statMarket: "Corner Markets",
-    model: 66,
-    implied: 54,
-    confidence: "Medium",
-  },
-  {
-    match: "Newcastle vs Wolves",
-    leagueGroup: "Premier League",
-    market: "Over 4.5 Cards",
-    statMarket: "Card Markets",
-    model: 61,
-    implied: 45,
-    confidence: "High",
-  },
-  {
-    match: "Inter vs Bayern",
-    leagueGroup: "UEFA Champions League",
-    market: "Both Teams To Score",
-    statMarket: "BTTS",
-    model: 72,
-    implied: 55,
-    confidence: "High",
-  },
-  {
-    match: "PSG vs Porto",
-    leagueGroup: "UEFA Champions League",
-    market: "Home Win",
-    model: 58,
-    implied: 50,
-    confidence: "Medium",
-  },
-  {
-    match: "Betis vs Real Madrid",
-    leagueGroup: "La Liga",
-    market: "Away -1 AH",
-    model: 47,
-    implied: 42,
-    confidence: "Low",
-  },
-  {
-    match: "Girona vs Sevilla",
-    leagueGroup: "La Liga",
-    market: "Both Teams To Score",
-    statMarket: "BTTS",
-    model: 69,
-    implied: 52,
-    confidence: "High",
-  },
-  {
-    match: "Atalanta vs Bologna",
-    leagueGroup: "Serie A",
-    market: "Over 2.5 Goals",
-    statMarket: "Over 2.5 Goals",
-    model: 70,
-    implied: 61,
-    confidence: "Medium",
-  },
-  {
-    match: "Lazio vs Roma",
-    leagueGroup: "Serie A",
-    market: "Over 5.5 Cards",
-    statMarket: "Card Markets",
-    model: 64,
-    implied: 44,
-    confidence: "High",
-  },
-  {
-    match: "Leverkusen vs Stuttgart",
-    leagueGroup: "Bundesliga",
-    market: "Both Teams To Score",
-    statMarket: "BTTS",
-    model: 66,
-    implied: 55,
-    confidence: "Medium",
-  },
-  {
-    match: "Dortmund vs Union Berlin",
-    leagueGroup: "Bundesliga",
-    market: "Over 10.5 Corners",
-    statMarket: "Corner Markets",
-    model: 68,
-    implied: 50,
-    confidence: "High",
-  },
-  {
-    match: "Al Ahly vs Zamalek",
-    leagueGroup: "African Leagues / CAF",
-    market: "Under 2.5 Goals",
-    model: 63,
-    implied: 55,
-    confidence: "Medium",
-  },
-  {
-    match: "Mamelodi Sundowns vs Esperance",
-    leagueGroup: "African Leagues / CAF",
-    market: "Home Win",
-    model: 61,
-    implied: 44,
-    confidence: "High",
-  },
-  {
-    match: "Simba SC vs TP Mazembe",
-    leagueGroup: "African Leagues / CAF",
-    market: "Over 2.5 Goals",
-    statMarket: "Over 2.5 Goals",
-    model: 58,
-    implied: 49,
-    confidence: "Medium",
-  },
-];
+/** Value spots built from live bookmaker prices: de-vigged model line vs best available price. */
+export function liveValueSpots(fixtures: LiveFixture[]): ValueSpot[] {
+  return fixtures.flatMap((f) => {
+    const books = f.books ?? [];
+    const spots = [
+      toSpot(f, "Home Win", f.homeWin, books.map((b) => b.homeDecimal)),
+      f.draw > 0 ? toSpot(f, "Draw", f.draw, books.map((b) => b.drawDecimal)) : null,
+      toSpot(f, "Away Win", f.awayWin, books.map((b) => b.awayDecimal)),
+    ];
+    return spots.filter((s): s is ValueSpot => s !== null);
+  });
+}
 
 export function edgeOf(v: ValueSpot) {
   return Math.round((v.model - v.implied) * 10) / 10;

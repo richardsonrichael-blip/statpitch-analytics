@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
 import { HeroMatch } from "@/components/statpitch/HeroMatch";
@@ -11,8 +11,9 @@ import { TelegramBanner } from "@/components/statpitch/TelegramBanner";
 import { BetBuilder } from "@/components/statpitch/BetBuilder";
 import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
-import { matchesQueryOptions } from "@/lib/matches.query";
-import { SPORTS, buildSportFixtures, type SportId } from "@/data/sports";
+import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
+import { SPORTS, type SportId } from "@/data/sports";
+import { liveValueSpots } from "@/data/value-bets";
 
 
 export const Route = createFileRoute("/")({
@@ -51,16 +52,15 @@ const tabs = [
 ] as const;
 
 function Index() {
-  const { data } = useSuspenseQuery(matchesQueryOptions);
+  const { data: football } = useSuspenseQuery(matchesQueryOptions);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<(typeof tabs)[number]>("Fixtures & Trends");
   const [sport, setSport] = useState<SportId>("football");
   const [pricingOpen, setPricingOpen] = useState(false);
 
-  const sportFixtures = useMemo(
-    () => (sport === "football" ? data.fixtures : buildSportFixtures(sport)),
-    [sport, data.fixtures],
-  );
+  const sportQuery = useQuery(matchesQuery(sport));
+  const data = sport === "football" ? football : sportQuery.data;
+  const sportFixtures = data?.fixtures ?? [];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -70,13 +70,16 @@ function Index() {
     );
   }, [query, sportFixtures]);
 
+  const spots = useMemo(() => liveValueSpots(sportFixtures), [sportFixtures]);
+  const loading = sport !== "football" && sportQuery.isPending;
+
   return (
     <div className="min-h-screen">
       <AppHeader
-        liveCount={data.liveCount}
+        liveCount={data?.liveCount ?? 0}
         query={query}
         onQueryChange={setQuery}
-        fixtures={data.fixtures}
+        fixtures={football.fixtures}
       />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
@@ -107,7 +110,7 @@ function Index() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <div className="lg:col-span-8">
-            <HeroMatch />
+            <HeroMatch fixture={sportFixtures[0]} />
           </div>
           <div className="space-y-6 lg:col-span-4">
             <ProRail onSeeAll={() => setPricingOpen(true)} />
@@ -131,19 +134,28 @@ function Index() {
           ))}
         </nav>
 
-        {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
-        {tab === "H2H Comparison" && <H2HTab />}
-        {tab === "Value Bets / Analytics" && <ValueBetsTab key={sport} sport={sport} />}
-        {tab === "AI Bet Builder" && <BetBuilder />}
-
+        {loading ? (
+          <p className="rounded-2xl border border-border bg-surface p-6 text-sm text-muted-foreground">
+            Loading live odds…
+          </p>
+        ) : (
+          <>
+            {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
+            {tab === "H2H Comparison" && <H2HTab />}
+            {tab === "Value Bets / Analytics" && (
+              <ValueBetsTab key={sport} fixtures={sportFixtures} />
+            )}
+            {tab === "AI Bet Builder" && <BetBuilder spots={spots} />}
+          </>
+        )}
       </main>
 
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         StatPitch Analytics ·{" "}
-        {data.source === "live"
-          ? "Live data from Football-Data.org."
-          : "Showing sample data — live feed unavailable."}
+        {data?.source === "live"
+          ? "Live fixtures and odds from The Odds API."
+          : "Live odds feed unavailable right now."}
       </footer>
 
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
