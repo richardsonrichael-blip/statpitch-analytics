@@ -81,21 +81,22 @@ function Rows({ rows }: { rows: ValueSpot[] }) {
   );
 }
 
-export function ValueBetsTab({ sport = "football" }: { sport?: SportId }) {
+export function ValueBetsTab({ fixtures }: { fixtures: LiveFixture[] }) {
   const { isPro } = useProAccess();
   const [league, setLeague] = useState<LeagueGroup | "All">("All");
   const [stats, setStats] = useState<StatMarket[]>([]);
-  const meta = sportById(sport)!;
+
+  const spots = useMemo(() => liveValueSpots(fixtures), [fixtures]);
 
   const leagueFilters = useMemo(
     () =>
-      sport === "football"
-        ? LEAGUE_FILTERS
-        : meta.leagues.map((l) => ({ id: l, label: `${meta.emoji} ${l}` })),
-    [sport, meta],
+      Array.from(new Set(fixtures.map((f) => f.league))).map((l) => ({ id: l, label: l })),
+    [fixtures],
   );
-  const statFilters = sport === "football" ? STAT_FILTERS : meta.markets;
-  const spots = useMemo(() => sportValueSpots(sport), [sport]);
+  const statFilters = useMemo(
+    () => OUTCOME_FILTERS.filter((m) => (m === "Draw" ? fixtures.some((f) => f.draw > 0) : true)),
+    [fixtures],
+  );
 
 
   const filtered = useMemo(
