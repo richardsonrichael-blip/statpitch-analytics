@@ -61,7 +61,7 @@ export function OddsBoard({
   selection: string;
   label?: string;
   /** Real prices from the live odds feed; falls back to modelled prices when absent. */
-  books?: BookPrice[];
+  books?: BookPrice[] | undefined;
   side?: Side;
 }) {
   const { format } = useOddsFormat();

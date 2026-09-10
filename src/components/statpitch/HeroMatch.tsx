@@ -32,7 +32,7 @@ function kickoffLabel(iso: string) {
 }
 
 /** Top match of the current sport, priced from the live odds feed. */
-export function HeroMatch({ fixture }: { fixture?: LiveFixture }) {
+export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
   if (!fixture) {
     return (
       <section className="pitch-hero rounded-3xl border border-border p-7 card-shadow">
