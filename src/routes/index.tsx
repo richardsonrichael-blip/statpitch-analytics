@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
 import { HeroMatch } from "@/components/statpitch/HeroMatch";
@@ -11,8 +11,9 @@ import { TelegramBanner } from "@/components/statpitch/TelegramBanner";
 import { BetBuilder } from "@/components/statpitch/BetBuilder";
 import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
-import { matchesQueryOptions } from "@/lib/matches.query";
-import { SPORTS, buildSportFixtures, type SportId } from "@/data/sports";
+import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
+import { SPORTS, type SportId } from "@/data/sports";
+import { liveValueSpots } from "@/data/value-bets";
 
 
 export const Route = createFileRoute("/")({
