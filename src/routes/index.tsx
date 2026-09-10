@@ -52,16 +52,15 @@ const tabs = [
 ] as const;
 
 function Index() {
-  const { data } = useSuspenseQuery(matchesQueryOptions);
+  const { data: football } = useSuspenseQuery(matchesQueryOptions);
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<(typeof tabs)[number]>("Fixtures & Trends");
   const [sport, setSport] = useState<SportId>("football");
   const [pricingOpen, setPricingOpen] = useState(false);
 
-  const sportFixtures = useMemo(
-    () => (sport === "football" ? data.fixtures : buildSportFixtures(sport)),
-    [sport, data.fixtures],
-  );
+  const sportQuery = useQuery(matchesQuery(sport));
+  const data = sport === "football" ? football : sportQuery.data;
+  const sportFixtures = data?.fixtures ?? [];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -70,6 +69,9 @@ function Index() {
       [f.home, f.away, f.league].some((v) => v.toLowerCase().includes(q)),
     );
   }, [query, sportFixtures]);
+
+  const spots = useMemo(() => liveValueSpots(sportFixtures), [sportFixtures]);
+  const loading = sport !== "football" && sportQuery.isPending;
 
   return (
     <div className="min-h-screen">
