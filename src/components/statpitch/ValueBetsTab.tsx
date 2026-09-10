@@ -5,16 +5,15 @@ import { useProAccess } from "@/hooks/useProAccess";
 import { useOddsFormat } from "@/hooks/useOddsFormat";
 import { bestPrice, betLink, bookmakerPrices, formatOdds } from "@/lib/odds";
 import {
-  LEAGUE_FILTERS,
-  STAT_FILTERS,
+  OUTCOME_FILTERS,
   edgeOf,
   isHighValue,
-  valueSpots,
+  liveValueSpots,
   type LeagueGroup,
   type StatMarket,
   type ValueSpot,
 } from "@/data/value-bets";
-import { sportById, sportValueSpots, type SportId } from "@/data/sports";
+import type { LiveFixture } from "@/data/mock-live";
 
 
 const FREE_ROWS = 3;
