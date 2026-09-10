@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Check, Copy, Dices } from "lucide-react";
 import { useOddsFormat } from "@/hooks/useOddsFormat";
 import { decimalFromProbability, formatOdds } from "@/lib/odds";
-import { valueSpots, type ValueSpot } from "@/data/value-bets";
+import type { ValueSpot } from "@/data/value-bets";
 
 const RISK_LEVELS = [
   { id: "Safe", minModel: 65, legs: 3 },
@@ -14,9 +14,9 @@ type Risk = (typeof RISK_LEVELS)[number]["id"];
 
 type Leg = { spot: ValueSpot; decimal: number };
 
-function buildSlip(risk: Risk, minOdds: number, maxOdds: number) {
+function buildSlip(spots: ValueSpot[], risk: Risk, minOdds: number, maxOdds: number) {
   const cfg = RISK_LEVELS.find((r) => r.id === risk)!;
-  const pool = valueSpots
+  const pool = spots
     .filter((s) => s.model >= cfg.minModel)
     .sort((a, b) => b.model - a.model)
     .map<Leg>((spot) => ({ spot, decimal: decimalFromProbability(spot.model) }));
@@ -48,7 +48,7 @@ function slipCode(legs: Leg[], risk: Risk) {
   return `SP-${risk[0]}${legs.length}-${letters}`.slice(0, 22);
 }
 
-export function BetBuilder() {
+export function BetBuilder({ spots }: { spots: ValueSpot[] }) {
   const { format } = useOddsFormat();
   const [minOdds, setMinOdds] = useState(2);
   const [maxOdds, setMaxOdds] = useState(5);
@@ -127,7 +127,7 @@ export function BetBuilder() {
       </div>
 
       <button
-        onClick={() => setSlip(buildSlip(risk, minOdds, maxOdds))}
+        onClick={() => setSlip(buildSlip(spots, risk, minOdds, maxOdds))}
         className="mt-4 w-full rounded-xl bg-neon py-3 text-sm font-bold text-primary-foreground transition hover:bg-neon/90"
       >
         Generate slip
