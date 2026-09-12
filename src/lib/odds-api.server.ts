@@ -133,7 +133,8 @@ async function fetchFeed(path: string, apiKey: string): Promise<ApiEvent[]> {
   return Array.isArray(json) ? (json as ApiEvent[]) : [];
 }
 
-const CACHE_TTL = 10 * 60 * 1000;
+// The free plan allows 500 credits a month (~16/day), so cache each feed for hours.
+const CACHE_TTL = 2 * 60 * 60 * 1000;
 const cache = new Map<string, { at: number; events: ApiEvent[] }>();
 
 /** Cached feed read so page views don't burn the API quota. */
