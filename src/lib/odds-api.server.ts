@@ -157,7 +157,8 @@ const GROUP_PREFIX: Record<SportId, string> = {
 
 /** Live fixtures + real bookmaker prices for one sport tab. */
 export async function fetchSportMatches(sport: SportId): Promise<MatchesPayload> {
-  const apiKey = process.env["THE_ODDS_API_KEY"];
+  const apiKey = process.env["THE_ODDS_API_KEY"]?.trim();
+  console.log("odds-api key length", apiKey?.length ?? 0);
   if (!apiKey) {
     console.error("THE_ODDS_API_KEY is not configured");
     return { source: "mock", liveCount: 0, fixtures: [] };
