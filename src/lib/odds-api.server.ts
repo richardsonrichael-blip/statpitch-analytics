@@ -122,29 +122,6 @@ async function fetchKey(key: string, apiKey: string): Promise<ApiEvent[]> {
   url.searchParams.set("apiKey", apiKey);
   url.searchParams.set("regions", "uk,eu,us");
   url.searchParams.set("markets", "h2h");
-  url.searchParams.set("oddsFormat", "decimal");
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    console.error("the-odds-api league request failed", key, res.status);
-    return [];
-  }
-  const json = await res.json();
-  return Array.isArray(json) ? (json as ApiEvent[]) : [];
-}
-
-/** Catch-all upcoming feed, used to top up sports with no in-season league key. */
-async function fetchUpcoming(apiKey: string): Promise<ApiEvent[]> {
-  const url = new URL(`${BASE}/upcoming/odds/`);
-  url.searchParams.set("apiKey", apiKey);
-  url.searchParams.set("regions", "uk,eu,us");
-  url.searchParams.set("markets", "h2h");
-  url.searchParams.set("oddsFormat", "decimal");
-  const res = await fetch(url.toString());
-  if (!res.ok) return [];
-  const json = await res.json();
-  return Array.isArray(json) ? (json as ApiEvent[]) : [];
-}
-
 const GROUP_PREFIX: Record<SportId, string> = {
   football: "soccer_",
   basketball: "basketball_",
