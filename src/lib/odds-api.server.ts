@@ -117,32 +117,33 @@ function mapEvent(event: ApiEvent, sport: SportId): LiveFixture | null {
   };
 }
 
-async function fetchKey(key: string, apiKey: string): Promise<ApiEvent[]> {
-  const url = new URL(`${BASE}/${key}/odds/`);
+/** One API credit per request: a single region, single market. */
+async function fetchFeed(path: string, apiKey: string): Promise<ApiEvent[]> {
+  const url = new URL(`${BASE}/${path}/odds/`);
   url.searchParams.set("apiKey", apiKey);
-  url.searchParams.set("regions", "uk,eu,us");
+  url.searchParams.set("regions", "uk");
   url.searchParams.set("markets", "h2h");
   url.searchParams.set("oddsFormat", "decimal");
   const res = await fetch(url.toString());
   if (!res.ok) {
-    console.error("the-odds-api league request failed", key, res.status);
+    console.error("the-odds-api request failed", path, res.status, await res.text());
     return [];
   }
   const json = await res.json();
   return Array.isArray(json) ? (json as ApiEvent[]) : [];
 }
 
-/** Catch-all upcoming feed, used to top up sports with no in-season league key. */
-async function fetchUpcoming(apiKey: string): Promise<ApiEvent[]> {
-  const url = new URL(`${BASE}/upcoming/odds/`);
-  url.searchParams.set("apiKey", apiKey);
-  url.searchParams.set("regions", "uk,eu,us");
-  url.searchParams.set("markets", "h2h");
-  url.searchParams.set("oddsFormat", "decimal");
-  const res = await fetch(url.toString());
-  if (!res.ok) return [];
-  const json = await res.json();
-  return Array.isArray(json) ? (json as ApiEvent[]) : [];
+// The free plan allows 500 credits a month (~16/day), so cache each feed for hours.
+const CACHE_TTL = 2 * 60 * 60 * 1000;
+const cache = new Map<string, { at: number; events: ApiEvent[] }>();
+
+/** Cached feed read so page views don't burn the API quota. */
+async function cachedFeed(path: string, apiKey: string): Promise<ApiEvent[]> {
+  const hit = cache.get(path);
+  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.events;
+  const events = await fetchFeed(path, apiKey);
+  if (events.length > 0 || !hit) cache.set(path, { at: Date.now(), events });
+  return events.length > 0 ? events : (hit?.events ?? []);
 }
 
 const GROUP_PREFIX: Record<SportId, string> = {
@@ -157,22 +158,27 @@ const GROUP_PREFIX: Record<SportId, string> = {
 
 /** Live fixtures + real bookmaker prices for one sport tab. */
 export async function fetchSportMatches(sport: SportId): Promise<MatchesPayload> {
-  const apiKey = process.env["THE_ODDS_API_KEY"];
+  const apiKey = process.env["THE_ODDS_API_KEY"]?.trim();
   if (!apiKey) {
     console.error("THE_ODDS_API_KEY is not configured");
     return { source: "mock", liveCount: 0, fixtures: [] };
   }
 
-  const keys = SPORT_KEYS[sport];
-  const results = await Promise.all(keys.map((k) => fetchKey(k, apiKey)));
-  let events = results.flat();
+  const prefix = GROUP_PREFIX[sport];
+  const extraPrefix = sport === "combat" ? "boxing_" : prefix;
 
+  // Cheapest first: the shared "upcoming" feed covers many sports for one credit.
+  let events = (await cachedFeed("upcoming", apiKey)).filter(
+    (e) => e.sport_key.startsWith(prefix) || e.sport_key.startsWith(extraPrefix),
+  );
+
+  // Only reach for league feeds when the shared feed has nothing for this sport.
   if (events.length === 0) {
-    const prefix = GROUP_PREFIX[sport];
-    const boxing = sport === "combat" ? "boxing_" : prefix;
-    events = (await fetchUpcoming(apiKey)).filter(
-      (e) => e.sport_key.startsWith(prefix) || e.sport_key.startsWith(boxing),
-    );
+    for (const key of SPORT_KEYS[sport]) {
+      const leagueEvents = await cachedFeed(key, apiKey);
+      events = events.concat(leagueEvents);
+      if (events.length >= 8) break;
+    }
   }
 
   const fixtures = events
