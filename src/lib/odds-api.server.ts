@@ -158,22 +158,26 @@ const GROUP_PREFIX: Record<SportId, string> = {
 /** Live fixtures + real bookmaker prices for one sport tab. */
 export async function fetchSportMatches(sport: SportId): Promise<MatchesPayload> {
   const apiKey = process.env["THE_ODDS_API_KEY"]?.trim();
-  console.log("odds-api key length", apiKey?.length ?? 0);
   if (!apiKey) {
     console.error("THE_ODDS_API_KEY is not configured");
     return { source: "mock", liveCount: 0, fixtures: [] };
   }
 
-  const keys = SPORT_KEYS[sport];
-  const results = await Promise.all(keys.map((k) => fetchKey(k, apiKey)));
-  let events = results.flat();
+  const prefix = GROUP_PREFIX[sport];
+  const extraPrefix = sport === "combat" ? "boxing_" : prefix;
 
+  // Cheapest first: the shared "upcoming" feed covers many sports for one credit.
+  let events = (await cachedFeed("upcoming", apiKey)).filter(
+    (e) => e.sport_key.startsWith(prefix) || e.sport_key.startsWith(extraPrefix),
+  );
+
+  // Only reach for league feeds when the shared feed has nothing for this sport.
   if (events.length === 0) {
-    const prefix = GROUP_PREFIX[sport];
-    const boxing = sport === "combat" ? "boxing_" : prefix;
-    events = (await fetchUpcoming(apiKey)).filter(
-      (e) => e.sport_key.startsWith(prefix) || e.sport_key.startsWith(boxing),
-    );
+    for (const key of SPORT_KEYS[sport]) {
+      const leagueEvents = await cachedFeed(key, apiKey);
+      events = events.concat(leagueEvents);
+      if (events.length >= 8) break;
+    }
   }
 
   const fixtures = events
