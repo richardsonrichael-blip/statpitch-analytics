@@ -117,11 +117,34 @@ function mapEvent(event: ApiEvent, sport: SportId): LiveFixture | null {
   };
 }
 
-async function fetchKey(key: string, apiKey: string): Promise<ApiEvent[]> {
-  const url = new URL(`${BASE}/${key}/odds/`);
+/** One API credit per request: a single region, single market. */
+async function fetchFeed(path: string, apiKey: string): Promise<ApiEvent[]> {
+  const url = new URL(`${BASE}/${path}/odds/`);
   url.searchParams.set("apiKey", apiKey);
-  url.searchParams.set("regions", "uk,eu,us");
+  url.searchParams.set("regions", "uk");
   url.searchParams.set("markets", "h2h");
+  url.searchParams.set("oddsFormat", "decimal");
+  const res = await fetch(url.toString());
+  if (!res.ok) {
+    console.error("the-odds-api request failed", path, res.status, await res.text());
+    return [];
+  }
+  const json = await res.json();
+  return Array.isArray(json) ? (json as ApiEvent[]) : [];
+}
+
+const CACHE_TTL = 10 * 60 * 1000;
+const cache = new Map<string, { at: number; events: ApiEvent[] }>();
+
+/** Cached feed read so page views don't burn the API quota. */
+async function cachedFeed(path: string, apiKey: string): Promise<ApiEvent[]> {
+  const hit = cache.get(path);
+  if (hit && Date.now() - hit.at < CACHE_TTL) return hit.events;
+  const events = await fetchFeed(path, apiKey);
+  if (events.length > 0 || !hit) cache.set(path, { at: Date.now(), events });
+  return events.length > 0 ? events : (hit?.events ?? []);
+}
+
 const GROUP_PREFIX: Record<SportId, string> = {
   football: "soccer_",
   basketball: "basketball_",
