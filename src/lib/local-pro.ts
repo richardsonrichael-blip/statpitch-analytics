@@ -1,4 +1,33 @@
 const KEY = "isProSubscriber";
+const PENDING_KEY = "statpitch:upgrade-pending";
+
+/** Marks that a checkout was opened, so the app polls for Pro activation. */
+export function setUpgradePending(value: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    if (value) window.localStorage.setItem(PENDING_KEY, String(Date.now()));
+    else window.localStorage.removeItem(PENDING_KEY);
+    window.dispatchEvent(new Event("statpitch:pro-change"));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** True while a checkout was started in the last 30 minutes. */
+export function readUpgradePending(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const at = Number(window.localStorage.getItem(PENDING_KEY));
+    if (!at) return false;
+    if (Date.now() - at > 30 * 60 * 1000) {
+      window.localStorage.removeItem(PENDING_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /** Reads the browser-side Pro flag (set after a successful Paystack redirect). */
 export function readLocalPro(): boolean {

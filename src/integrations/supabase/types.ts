@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_predictions: {
+        Row: {
+          away_win_prob: number
+          confidence: number
+          created_at: string
+          draw_prob: number
+          home_win_prob: number
+          id: string
+          match_id: string
+          model_note: string | null
+          predicted_score: string
+          recommended_pick: string
+          updated_at: string
+          value_edge: number
+        }
+        Insert: {
+          away_win_prob: number
+          confidence: number
+          created_at?: string
+          draw_prob?: number
+          home_win_prob: number
+          id?: string
+          match_id: string
+          model_note?: string | null
+          predicted_score: string
+          recommended_pick: string
+          updated_at?: string
+          value_edge?: number
+        }
+        Update: {
+          away_win_prob?: number
+          confidence?: number
+          created_at?: string
+          draw_prob?: number
+          home_win_prob?: number
+          id?: string
+          match_id?: string
+          model_note?: string | null
+          predicted_score?: string
+          recommended_pick?: string
+          updated_at?: string
+          value_edge?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_predictions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: true
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           away_score: number | null
@@ -127,7 +180,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_pro_access: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
