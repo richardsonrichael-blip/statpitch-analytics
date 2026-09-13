@@ -18,6 +18,6 @@ export const getMatches = createServerFn({ method: "GET" })
     sport: input?.sport && SPORTS.includes(input.sport) ? input.sport : ("football" as SportId),
   }))
   .handler(async ({ data }): Promise<MatchesPayload> => {
-    const { fetchSportMatches } = await import("./odds-api.server");
+    const { fetchSportMatches } = await import("./matches.server");
     return fetchSportMatches(data.sport);
   });

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      matches: {
+        Row: {
+          away_score: number | null
+          away_team: string
+          books: Json
+          commence_time: string
+          created_at: string
+          home_score: number | null
+          home_team: string
+          id: string
+          league: string
+          sport: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          away_score?: number | null
+          away_team: string
+          books?: Json
+          commence_time: string
+          created_at?: string
+          home_score?: number | null
+          home_team: string
+          id?: string
+          league: string
+          sport: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          away_score?: number | null
+          away_team?: string
+          books?: Json
+          commence_time?: string
+          created_at?: string
+          home_score?: number | null
+          home_team?: string
+          id?: string
+          league?: string
+          sport?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number | null
