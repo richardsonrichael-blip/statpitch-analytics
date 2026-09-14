@@ -1,5 +1,5 @@
 import type { LiveFixture } from "@/data/mock-live";
-import { ProLock } from "@/components/statpitch/ProLock";
+import { AiPredictionPanel } from "@/components/statpitch/AiPredictionPanel";
 import { OddsBoard } from "@/components/statpitch/OddsPanel";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
@@ -121,28 +121,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
       </div>
 
       <div className="mt-4">
-        <ProLock feature="AI match prediction" cta="Unlock">
-          <div className="grid gap-4 rounded-2xl border border-border bg-surface/70 p-4 sm:grid-cols-3">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Model pick
-              </p>
-              <p className="mt-1 text-2xl font-bold">{favourite}</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Model confidence
-              </p>
-              <p className="mt-1 text-2xl font-bold text-neon tabular-nums">{favouriteProb}%</p>
-            </div>
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Books priced
-              </p>
-              <p className="mt-1 text-2xl font-bold tabular-nums">{bookCount}</p>
-            </div>
-          </div>
-        </ProLock>
+        <AiPredictionPanel fixture={fixture} />
       </div>
     </section>
   );
