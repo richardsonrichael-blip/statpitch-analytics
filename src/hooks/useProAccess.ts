@@ -4,7 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { getProStatus } from "@/lib/pro.functions";
-import { consumePaymentSuccessParam, readLocalPro } from "@/lib/local-pro";
+import {
+  consumePaymentSuccessParam,
+  readLocalPro,
+  readUpgradePending,
+  setUpgradePending,
+} from "@/lib/local-pro";
 
 export function useAuthSession() {
   const [session, setSession] = useState<Session | null>(null);
