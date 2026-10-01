@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   errorComponent: ({ error }) => (
     <p role="alert" className="p-8 text-sm text-destructive">
-      {error.message}
+      {error instanceof Error ? error.message : "Something went wrong."}
     </p>
   ),
   notFoundComponent: () => <p className="p-8 text-sm text-muted-foreground">No matches found.</p>,
