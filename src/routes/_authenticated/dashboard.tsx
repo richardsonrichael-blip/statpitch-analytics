@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProAccess } from "@/hooks/useProAccess";
 import { verifyPaystackPayment } from "@/lib/pro.functions";
 import { openPaystackCheckout } from "@/lib/utils";
+import { DeleteAccount } from "@/components/statpitch/DeleteAccount";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => {
@@ -164,6 +165,7 @@ function AccountPage() {
           </Link>
         </section>
       )}
+      {user && <DeleteAccount />}
     </div>
   );
 }
