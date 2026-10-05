@@ -1,4 +1,4 @@
-import { Check, Send, X } from "lucide-react";
+import { Check, Phone, Send, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { openPaystackCheckout } from "@/lib/utils";
@@ -138,6 +138,9 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
           className="flex items-center justify-center gap-2 rounded-xl border border-neon/30 bg-surface py-2.5 text-sm font-bold text-neon transition hover:bg-neon/10"
         >
           <Send className="size-4" /> Join 10,000+ bettors in our VIP Telegram group
+        </a>
+        <a href="tel:0202165004" className="flex items-center justify-center gap-2 text-sm font-bold text-neon hover:underline">
+          <Phone className="size-4" /> Need help paying? Call / WhatsApp 0202165004
         </a>
         <p className="text-center text-[11px] text-muted-foreground">
           Instant activation after payment. 18+ · Bet responsibly. By subscribing
