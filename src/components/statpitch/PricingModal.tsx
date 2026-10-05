@@ -140,7 +140,16 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
           <Send className="size-4" /> Join 10,000+ bettors in our VIP Telegram group
         </a>
         <p className="text-center text-[11px] text-muted-foreground">
-          Instant activation after payment. 18+ · Bet responsibly.
+          Instant activation after payment. 18+ · Bet responsibly. By subscribing
+          you agree to our{" "}
+          <Link to="/terms" className="text-neon hover:underline">
+            Terms
+          </Link>{" "}
+          and{" "}
+          <Link to="/privacy" className="text-neon hover:underline">
+            Privacy Policy
+          </Link>
+          .
         </p>
       </DialogContent>
     </Dialog>
