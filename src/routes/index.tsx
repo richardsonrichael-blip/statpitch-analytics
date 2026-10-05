@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
@@ -156,6 +156,14 @@ function Index() {
         {data?.source === "live"
           ? "Live fixtures and odds from The Odds API."
           : "Live odds feed unavailable right now."}
+        <div className="mt-2 flex items-center justify-center gap-4">
+          <Link to="/terms" className="hover:text-foreground">
+            Terms of Service
+          </Link>
+          <Link to="/privacy" className="hover:text-foreground">
+            Privacy Policy
+          </Link>
+        </div>
       </footer>
 
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
