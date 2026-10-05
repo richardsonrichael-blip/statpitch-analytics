@@ -68,7 +68,7 @@ const SECTIONS: { heading: string; paragraphs: string[] }[] = [
   {
     heading: "6. Your rights",
     paragraphs: [
-      "You can access, correct or delete your account data at any time. Deleting your account removes your profile and Pro status; payment records are retained only as long as required for accounting and dispute purposes.",
+      "You can access, correct or delete your account data at any time. Use \"Delete account\" on your account page to permanently remove your sign-in, profile, Pro status and the payment records we store. Paystack retains its own transaction records as required by law.",
       "You can object to processing or request a copy of your data by contacting us through the StatPitch VIP Telegram channel or the support contact shown in the app.",
       "If you are in the EEA or UK, you also have the right to lodge a complaint with your local data-protection authority.",
     ],
