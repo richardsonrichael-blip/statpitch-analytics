@@ -38,7 +38,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
       <section className="pitch-hero rounded-3xl border border-border p-7 card-shadow">
         <span className="stat-pill">Match of the Day</span>
         <p className="mt-4 text-sm text-muted-foreground">
-          No priced matches in this sport right now — check another sport or come back closer to
+          No upcoming matches in this sport right now — check another sport or come back closer to
           kick-off.
         </p>
       </section>
@@ -46,7 +46,6 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
   }
 
   const isLive = fixture.status === "IN_PLAY";
-  const bookCount = fixture.books?.length ?? 0;
   const favourite = fixture.homeWin >= fixture.awayWin ? fixture.home : fixture.away;
   const favouriteProb = Math.max(fixture.homeWin, fixture.awayWin);
 
@@ -68,8 +67,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
             {fixture.homeScore !== null && fixture.awayScore !== null
               ? `Score ${fixture.homeScore} - ${fixture.awayScore} · `
               : ""}
-            {bookCount > 0 ? `${bookCount} bookmakers priced` : "Market forming"} · Market
-            favourite {favourite}
+            Highest win probability · {favourite}
           </p>
         </div>
         <div className="hidden text-right sm:block">
@@ -81,7 +79,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Market probabilities
+            Win Probability %
           </p>
           <div className="space-y-2.5">
             <Bar label={fixture.home} value={fixture.homeWin} />
@@ -100,15 +98,8 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
 
         <div className="rounded-2xl border border-border bg-surface/70 p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Other side of the market
+            Team Analytics
           </p>
-          <div className="flex flex-wrap gap-2">
-            {fixture.pills.map((p) => (
-              <span key={p} className="stat-pill">
-                {p}
-              </span>
-            ))}
-          </div>
           <OddsBoard
             probability={fixture.awayWin}
             seed={`${fixture.id}-away`}

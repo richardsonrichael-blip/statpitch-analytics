@@ -5,7 +5,6 @@ import type { LiveFixture } from "@/data/mock-live";
 import { searchTeams } from "@/lib/team-directory";
 import { useProAccess } from "@/hooks/useProAccess";
 import { ProUpsellModal } from "@/components/statpitch/ProLock";
-import { OddsFormatToggle } from "@/components/statpitch/OddsPanel";
 
 export function AppHeader({
   liveCount,
@@ -46,9 +45,7 @@ export function AppHeader({
           </div>
         </Link>
 
-        <div className="ml-auto order-2 sm:order-none">
-          <OddsFormatToggle compact />
-        </div>
+
 
         <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5">
           <span className="relative grid size-2 place-items-center">

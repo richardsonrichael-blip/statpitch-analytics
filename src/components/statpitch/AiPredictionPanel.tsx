@@ -34,16 +34,16 @@ export function AiPredictionPanel({ fixture }: { fixture: LiveFixture }) {
     <ProLock feature="AI match prediction" cta="Unlock">
       <div className="rounded-2xl border border-border bg-surface/70 p-4">
         <div className="grid gap-4 sm:grid-cols-4">
-          <Cell label="Model pick" value={pick} />
+          <Cell label="Projected winner" value={pick} />
           <Cell label="Predicted score" value={score} />
           <Cell label="Confidence" value={confidence} tone="neon" />
-          <Cell label="Value edge" value={edge} tone="neon" />
+          <Cell label="Probability advantage" value={edge} tone="neon" />
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
           {loading
             ? "Loading model output…"
             : (prediction?.modelNote ??
-              "Model blends recent form, expected goals and closing-line movement.")}
+              "Model blends recent form, expected goals and match performance.")}
         </p>
       </div>
     </ProLock>

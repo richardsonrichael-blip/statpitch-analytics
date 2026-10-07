@@ -2,8 +2,6 @@ import { useMemo, useState } from "react";
 import { Flame } from "lucide-react";
 import { ProLock } from "@/components/statpitch/ProLock";
 import { useProAccess } from "@/hooks/useProAccess";
-import { useOddsFormat } from "@/hooks/useOddsFormat";
-import { bestPrice, betLink, bookmakerPrices, formatOdds } from "@/lib/odds";
 import {
   OUTCOME_FILTERS,
   edgeOf,
@@ -23,26 +21,20 @@ function Head() {
     <thead>
       <tr className="text-left text-[11px] uppercase tracking-widest text-muted-foreground">
         <th className="px-5 py-3 font-semibold">Match</th>
-        <th className="px-3 py-3 font-semibold">Market</th>
-        <th className="px-3 py-3 font-semibold">Model</th>
-        <th className="px-3 py-3 font-semibold">Implied</th>
-        <th className="px-3 py-3 font-semibold">Edge</th>
-        <th className="px-3 py-3 font-semibold">Best odds</th>
-        <th className="px-5 py-3 font-semibold">Bet</th>
+        <th className="px-3 py-3 font-semibold">Outcome</th>
+        <th className="px-3 py-3 font-semibold">Win Probability %</th>
+        <th className="px-3 py-3 font-semibold">Baseline Probability %</th>
+        <th className="px-3 py-3 font-semibold">Probability Difference</th>
       </tr>
     </thead>
   );
 }
 
 function Rows({ rows }: { rows: ValueSpot[] }) {
-  const { format } = useOddsFormat();
 
   return (
     <tbody>
       {rows.map((v) => {
-        const prices = bookmakerPrices(v.model, v.match + v.market);
-        const best = bestPrice(prices);
-        const selection = `${v.match} · ${v.market}`;
         return (
           <tr key={v.match + v.market} className="border-t border-border/70">
             <td className="px-5 py-3.5">
@@ -50,7 +42,7 @@ function Rows({ rows }: { rows: ValueSpot[] }) {
                 {v.match}
                 {isHighValue(v) && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-neon/15 px-2 py-0.5 text-[10px] font-bold text-neon">
-                    <Flame className="size-3" /> High Value Alert
+                    <Flame className="size-3" /> Model Highlight
                   </span>
                 )}
               </p>
@@ -60,20 +52,6 @@ function Rows({ rows }: { rows: ValueSpot[] }) {
             <td className="px-3 py-3.5 font-bold tabular-nums">{v.model}%</td>
             <td className="px-3 py-3.5 tabular-nums text-muted-foreground">{v.implied}%</td>
             <td className="px-3 py-3.5 font-bold text-neon tabular-nums">+{edgeOf(v)}%</td>
-            <td className="px-3 py-3.5">
-              <p className="font-bold tabular-nums">{formatOdds(best.decimal, format)}</p>
-              <p className="text-[11px] text-muted-foreground">{best.bookmaker.name}</p>
-            </td>
-            <td className="px-5 py-3.5">
-              <a
-                href={betLink(best.bookmaker, selection)}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="inline-block whitespace-nowrap rounded-full bg-neon px-3.5 py-1.5 text-[11px] font-bold text-primary-foreground transition hover:bg-neon/90"
-              >
-                Place Bet
-              </a>
-            </td>
           </tr>
         );
       })}
@@ -121,11 +99,11 @@ export function ValueBetsTab({ fixtures }: { fixtures: LiveFixture[] }) {
     <div className="overflow-hidden rounded-3xl border border-border bg-surface card-shadow">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
         <div>
-          <h3 className="text-base font-bold">Value spots by model edge</h3>
+          <h3 className="text-base font-bold">Match Probability Analytics</h3>
           <p className="text-xs text-muted-foreground">
             {isPro
-              ? "Full model probability vs market implied probability"
-              : `Free plan shows ${FREE_ROWS} value spots per day`}
+              ? "Model win probabilities compared with baseline estimates"
+              : `Free plan shows ${FREE_ROWS} match analyses`}
           </p>
         </div>
         {isPro && (
@@ -138,7 +116,7 @@ export function ValueBetsTab({ fixtures }: { fixtures: LiveFixture[] }) {
       <div className="space-y-3 border-b border-border px-5 py-4">
         <div className="flex gap-1.5 overflow-x-auto">
           {["All", ...leagueFilters.map((l) => l.id)].map((id) => {
-            const label = id === "All" ? "All leagues" : leagueFilters.find((l) => l.id === id)!.label;
+            const label = id === "All" ? "All leagues" : leagueFilters.find((l) => l.id === id)?.label ?? id;
             return (
               <button
                 key={id}
@@ -177,7 +155,7 @@ export function ValueBetsTab({ fixtures }: { fixtures: LiveFixture[] }) {
 
       {filtered.length === 0 ? (
         <p className="px-5 py-8 text-sm text-muted-foreground">
-          No value spots match these filters right now.
+          No match analyses match these filters right now.
         </p>
       ) : (
         <div className="overflow-x-auto">
@@ -190,7 +168,7 @@ export function ValueBetsTab({ fixtures }: { fixtures: LiveFixture[] }) {
 
       {!isPro && locked.length > 0 && (
         <div className="p-4">
-          <ProLock feature="Full value bet table & edge alerts" cta="Unlock">
+          <ProLock feature="Full probability analytics" cta="Unlock">
             <div className="overflow-x-auto rounded-2xl border border-border bg-background">
               <table className="w-full min-w-[780px] text-sm">
                 <Rows rows={locked} />
