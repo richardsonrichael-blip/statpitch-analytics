@@ -6,7 +6,7 @@ import { openPaystackCheckout } from "@/lib/utils";
 import { useProAccess } from "@/hooks/useProAccess";
 
 const perks = [
-  "Value bet edges, ROI projections and confidence tiers",
+  "AI win probabilities and confidence analysis",
   "xG breakdowns, BTTS depth and Over/Under 2.5 probabilities",
   "Interactive H2H radar and deep team metric comparisons",
   "Corner and card stat models with live probability updates",
@@ -28,10 +28,10 @@ export function ProUpsellModal({
       <DialogContent className="max-w-lg border-neon/30 bg-popover">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <Sparkles className="size-5 text-neon" /> Unlock {feature ?? "Pro analytics"}
+            <Sparkles className="size-5 text-neon" /> Unlock Pro Analytics
           </DialogTitle>
           <DialogDescription>
-            Pro turns StatPitch into a full model desk — here's what opens up instantly.
+            AI predictions, expected goals insights and detailed team performance comparisons.
           </DialogDescription>
         </DialogHeader>
 

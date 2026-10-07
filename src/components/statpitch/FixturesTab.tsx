@@ -64,14 +64,6 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               )}
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
-              {f.pills.map((p) => (
-                <span key={p} className="stat-pill">
-                  {p}
-                </span>
-              ))}
-            </div>
-
             <div className="mt-4 flex h-1.5 overflow-hidden rounded-full">
               <div className="bg-neon" style={{ width: `${f.homeWin}%` }} />
               {f.draw > 0 && (
@@ -80,9 +72,9 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               <div className="bg-neon-dim" style={{ width: `${f.awayWin}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-[11px] text-muted-foreground tabular-nums">
-              <span>1 · {f.homeWin}%</span>
-              {f.draw > 0 && <span>X · {f.draw}%</span>}
-              <span>2 · {f.awayWin}%</span>
+              <span>Home · {f.homeWin}%</span>
+              {f.draw > 0 && <span>Draw · {f.draw}%</span>}
+              <span>Away · {f.awayWin}%</span>
             </div>
 
 

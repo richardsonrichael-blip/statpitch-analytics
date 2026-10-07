@@ -7,28 +7,25 @@ import { FixturesTab } from "@/components/statpitch/FixturesTab";
 import { H2HTab } from "@/components/statpitch/H2HTab";
 import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
-import { TelegramBanner } from "@/components/statpitch/TelegramBanner";
-import { BetBuilder } from "@/components/statpitch/BetBuilder";
 import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
 import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
 import { SPORTS, type SportId } from "@/data/sports";
-import { liveValueSpots } from "@/data/value-bets";
 
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "StatPitch Analytics — Football Stats, H2H & Value Bets" },
+      { title: "StatPitch Analytics — Sports Statistics & Match Analytics" },
       {
         name: "description",
         content:
-          "Live football probabilities, head-to-head comparisons, Over/Under 2.5 trends and model-edge value bets in one dark analytics dashboard.",
+          "Sports win probabilities, head-to-head comparisons and team performance analytics.",
       },
-      { property: "og:title", content: "StatPitch Analytics — Football Stats & Value Bets" },
+      { property: "og:title", content: "StatPitch Analytics — Sports Statistics & Analytics" },
       {
         property: "og:description",
-        content: "Live match probabilities, H2H comparison tools and statistical value spots for football fans.",
+        content: "Match probabilities, H2H comparisons and team performance insights.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -47,8 +44,7 @@ export const Route = createFileRoute("/")({
 const tabs = [
   "Fixtures & Trends",
   "H2H Comparison",
-  "Value Bets / Analytics",
-  "AI Bet Builder",
+  "Probability Analytics",
 ] as const;
 
 function Index() {
@@ -70,7 +66,6 @@ function Index() {
     );
   }, [query, sportFixtures]);
 
-  const spots = useMemo(() => liveValueSpots(sportFixtures), [sportFixtures]);
   const loading = sport !== "football" && sportQuery.isPending;
 
   return (
@@ -83,7 +78,6 @@ function Index() {
       />
 
       <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
-        <TelegramBanner onGoPro={() => setPricingOpen(true)} />
 
         <nav
           aria-label="Choose a sport"
@@ -136,16 +130,15 @@ function Index() {
 
         {loading ? (
           <p className="rounded-2xl border border-border bg-surface p-6 text-sm text-muted-foreground">
-            Loading live odds…
+            Loading match analytics…
           </p>
         ) : (
           <>
             {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
             {tab === "H2H Comparison" && <H2HTab />}
-            {tab === "Value Bets / Analytics" && (
+            {tab === "Probability Analytics" && (
               <ValueBetsTab key={sport} fixtures={sportFixtures} />
             )}
-            {tab === "AI Bet Builder" && <BetBuilder spots={spots} />}
           </>
         )}
       </main>
@@ -153,9 +146,7 @@ function Index() {
 
       <footer className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         StatPitch Analytics ·{" "}
-        {data?.source === "live"
-          ? "Live fixtures and odds from The Odds API."
-          : "Live odds feed unavailable right now."}
+        Sample fixtures & statistical analytics.
         <div className="mt-2 flex items-center justify-center gap-4">
           <Link to="/terms" className="hover:text-foreground">
             Terms of Service

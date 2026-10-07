@@ -1,0 +1,3 @@
+- [ ] Hide betting promotions and bookmaker references; show analytical labels.
+- [ ] Update subscription windows to Unlock Pro Analytics.
+- [ ] Verify phone and desktop views.

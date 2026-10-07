@@ -6,8 +6,8 @@ import { openPaystackCheckout } from "@/lib/utils";
 const perks = [
   "AI score & scoreline predictions",
   "Deep H2H, xG, corner & card models",
-  "Full value-bet table + daily edges",
-  "VIP Telegram signals access",
+  "Full match probability analysis",
+  "Advanced team performance insights",
 ];
 
 /** Conversion rail: membership tiers, proof numbers and the upgrade action. */
@@ -63,7 +63,7 @@ export function ProRail({ onSeeAll }: { onSeeAll: () => void }) {
           onClick={openPaystackCheckout}
           className="mt-5 w-full rounded-xl bg-neon py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground transition hover:brightness-110"
         >
-          Unlock Pro now
+          Unlock Pro Analytics
         </button>
       ) : (
         <Link
@@ -71,7 +71,7 @@ export function ProRail({ onSeeAll }: { onSeeAll: () => void }) {
           search={{ redirect: "/dashboard" }}
           className="mt-5 block w-full rounded-xl bg-neon py-3 text-center text-xs font-bold uppercase tracking-wider text-primary-foreground transition hover:brightness-110"
         >
-          Unlock Pro now
+          Unlock Pro Analytics
         </Link>
       )}
 

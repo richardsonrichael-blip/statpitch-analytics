@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+ 
+Analytics presentation remains separate from stored bookmaker inputs so promotions can be hidden without changing fixture calculations or payment logic.

@@ -1,11 +1,10 @@
-import { Check, Phone, Send, X } from "lucide-react";
+import { Check, Phone, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { openPaystackCheckout } from "@/lib/utils";
 import { useProAccess } from "@/hooks/useProAccess";
-import { TELEGRAM_VIP_URL } from "@/lib/odds";
 
-const free = ["Match fixtures & trend cards", "League standings & team search", "Basic H2H comparison", "3 value spots per day"];
+const free = ["Match fixtures & trend cards", "League standings & team search", "Basic H2H comparison", "Basic win probabilities"];
 
 const tiers = [
   {
@@ -14,7 +13,7 @@ const tiers = [
     price: "$5",
     local: "GH₵ 75",
     period: "/7 days",
-    perks: ["7 days of AI predictions", "Daily value bets", "Live odds & best-price alerts"],
+    perks: ["7 days of AI predictions", "Match probability insights", "Detailed statistical comparisons"],
     popular: false,
   },
   {
@@ -25,9 +24,9 @@ const tiers = [
     period: "/month",
     perks: [
       "Full H2H insights & xG metrics",
-      "Telegram VIP access",
+      "Advanced match analytics",
       "Corner & card stat models",
-      "AI Bet Builder slips",
+      "AI win probability models",
     ],
     popular: true,
   },
@@ -40,9 +39,9 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto border-border bg-popover">
         <DialogHeader>
-          <DialogTitle className="text-xl">Upgrade your edge</DialogTitle>
+          <DialogTitle className="text-xl">Unlock Pro Analytics</DialogTitle>
           <DialogDescription>
-            Instant activation with Paystack or card — Pro unlocks AI predictions, VIP signals and stat models.
+            Unlock AI win probabilities, expected goals insights and detailed team comparisons with Pro.
           </DialogDescription>
         </DialogHeader>
 
@@ -131,19 +130,11 @@ export function PricingModal({ open, onOpenChange }: { open: boolean; onOpenChan
           ))}
         </div>
 
-        <a
-          href={TELEGRAM_VIP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 rounded-xl border border-neon/30 bg-surface py-2.5 text-sm font-bold text-neon transition hover:bg-neon/10"
-        >
-          <Send className="size-4" /> Join 10,000+ bettors in our VIP Telegram group
-        </a>
         <a href="tel:0202165004" className="flex items-center justify-center gap-2 text-sm font-bold text-neon hover:underline">
           <Phone className="size-4" /> Need help paying? Call / WhatsApp 0202165004
         </a>
         <p className="text-center text-[11px] text-muted-foreground">
-          Instant activation after payment. 18+ · Bet responsibly. By subscribing
+          Pro access activates after payment verification. By subscribing
           you agree to our{" "}
           <Link to="/terms" className="text-neon hover:underline">
             Terms
