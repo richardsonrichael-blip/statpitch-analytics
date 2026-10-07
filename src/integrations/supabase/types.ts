@@ -181,6 +181,7 @@ export type Database = {
     }
     Functions: {
       has_pro_access: { Args: { _user_id: string }; Returns: boolean }
+      roll_past_matches: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
