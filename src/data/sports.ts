@@ -5,7 +5,13 @@ export type SportId =
   | "american-football"
   | "ice-hockey"
   | "cricket"
-  | "combat";
+  | "combat"
+  | "baseball"
+  | "handball"
+  | "water-polo"
+  | "snooker"
+  | "badminton"
+  | "esports";
 
 export type Sport = {
   id: SportId;
@@ -81,6 +87,12 @@ export const SPORTS: Sport[] = [
     leagues: ["UFC", "Boxing"],
     markets: ["Fight Winner", "Method of Victory", "Round Betting", "Over 2.5 Rounds"],
   },
+  { id: "baseball", label: "Baseball", emoji: "⚾", hasDraw: false, leagues: ["MLB", "NPB"], markets: ["Match Winner", "Runs", "Team Form"] },
+  { id: "handball", label: "Handball", emoji: "🤾", hasDraw: true, leagues: ["EHF Champions League", "Bundesliga"], markets: ["Match Winner", "Goals", "Team Form"] },
+  { id: "water-polo", label: "Water Polo", emoji: "🤽", hasDraw: true, leagues: ["Champions League", "World Aquatics"], markets: ["Match Winner", "Goals", "Team Form"] },
+  { id: "snooker", label: "Snooker", emoji: "🎱", hasDraw: false, leagues: ["World Snooker Tour"], markets: ["Match Winner", "Frames", "Player Form"] },
+  { id: "badminton", label: "Badminton", emoji: "🏸", hasDraw: false, leagues: ["BWF World Tour"], markets: ["Match Winner", "Games", "Player Form"] },
+  { id: "esports", label: "Esports", emoji: "🎮", hasDraw: false, leagues: ["Counter-Strike 2", "League of Legends", "Dota 2"], markets: ["Match Winner", "Maps", "Team Form"] },
 ];
 
 export function sportById(id: SportId) {

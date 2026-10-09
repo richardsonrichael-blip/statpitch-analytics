@@ -41,7 +41,7 @@ export function AppHeader({
           </span>
           <div className="leading-tight">
             <h1 className="text-base font-bold sm:text-lg">StatPitch Analytics</h1>
-            <p className="text-[11px] text-muted-foreground">Data-first football insight</p>
+            <p className="text-[11px] text-muted-foreground">Data-first sports insight</p>
           </div>
         </Link>
 

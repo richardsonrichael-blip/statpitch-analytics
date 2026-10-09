@@ -11,6 +11,7 @@ import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
 import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
 import { SPORTS, type SportId } from "@/data/sports";
+import { Button } from "@/components/ui/button";
 
 
 export const Route = createFileRoute("/")({
@@ -84,8 +85,9 @@ function Index() {
           className="flex gap-1.5 overflow-x-auto rounded-2xl border border-border bg-surface p-1.5"
         >
           {SPORTS.map((s) => (
-            <button
+            <Button
               key={s.id}
+              variant="ghost"
               onClick={() => setSport(s.id)}
 
 
@@ -98,7 +100,7 @@ function Index() {
             >
               <span aria-hidden>{s.emoji}</span>
               {s.label}
-            </button>
+            </Button>
           ))}
         </nav>
 
