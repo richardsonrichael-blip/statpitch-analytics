@@ -154,7 +154,7 @@ function AccountPage() {
         <section className="rounded-3xl border border-border bg-surface p-6 card-shadow">
           <h2 className="text-lg font-bold">Everything is unlocked</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            AI predictions, the full value bets table, corner and card models and deep H2H comparisons are live
+            AI predictions, full match probability analytics, corner and card models and deep H2H comparisons are available
             on your dashboard.
           </p>
           <Link
