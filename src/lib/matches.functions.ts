@@ -1,17 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import type { MatchesPayload } from "@/data/mock-live";
-import type { SportId } from "@/data/sports";
+import { SPORTS as SPORT_DIRECTORY, type SportId } from "@/data/sports";
 
-const SPORTS: SportId[] = [
-  "football",
-  "basketball",
-  "tennis",
-  "american-football",
-  "ice-hockey",
-  "cricket",
-  "combat",
-];
+const SPORTS: SportId[] = SPORT_DIRECTORY.map((sport) => sport.id);
 
 export const getMatches = createServerFn({ method: "GET" })
   .inputValidator((input?: { sport?: SportId }) => ({

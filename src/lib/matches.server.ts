@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { BookPrice, LiveFixture, MatchesPayload } from "@/data/mock-live";
 import type { SportId } from "@/data/sports";
 import type { Database } from "@/integrations/supabase/types";
+import { readMatchProbabilities } from "./match-probabilities";
 
 /** Sports with a draw outcome in the h2h market. */
 const DRAW_SPORTS = new Set<SportId>(["football", "cricket", "ice-hockey"]);
@@ -11,7 +12,7 @@ function median(values: number[]) {
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   if (sorted.length === 0) return 0;
-  return sorted.length % 2 ? sorted[mid]! : (sorted[mid - 1]! + sorted[mid]!) / 2;
+  return sorted.length % 2 ? (sorted[mid] ?? 0) : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
 }
 
 /** Remove bookmaker margin from decimal odds and return integer percentages. */
@@ -22,7 +23,7 @@ function deVig(home: number, draw: number | null, away: number) {
   const pct = raw.map((r) => Math.round((r / total) * 100));
   const drift = 100 - pct.reduce((a, b) => a + b, 0);
   pct[0] = (pct[0] ?? 0) + drift;
-  return { homeWin: Math.max(1, pct[0]!), draw: pct[1] ?? 0, awayWin: Math.max(1, pct[2]!) };
+  return { homeWin: Math.max(1, pct[0] ?? 0), draw: pct[1] ?? 0, awayWin: Math.max(1, pct[2] ?? 0) };
 }
 
 type Row = Database["public"]["Tables"]["matches"]["Row"];
@@ -49,17 +50,17 @@ function parseBooks(value: unknown): BookPrice[] {
 
 function mapRow(row: Row, sport: SportId): LiveFixture | null {
   const books = parseBooks(row.books);
-  if (books.length === 0) return null;
+  const analytics = readMatchProbabilities(row.probabilities);
+  if (!analytics && books.length === 0) return null;
 
   const drawPrices = books.map((b) => b.drawDecimal).filter((d): d is number => !!d);
-  const { homeWin, draw, awayWin } = deVig(
+  const { homeWin, draw, awayWin } = analytics ?? deVig(
     median(books.map((b) => b.homeDecimal)),
     DRAW_SPORTS.has(sport) && drawPrices.length > 0 ? median(drawPrices) : null,
     median(books.map((b) => b.awayDecimal)),
   );
 
   const isLive = row.status === "IN_PLAY" || row.status === "LIVE" || row.status === "PAUSED";
-  const bestHome = Math.max(...books.map((b) => b.homeDecimal));
 
   return {
     id: row.id,
@@ -75,8 +76,6 @@ function mapRow(row: Row, sport: SportId): LiveFixture | null {
     pills: [
       row.league,
       isLive ? "In play" : "Upcoming",
-      `Best ${bestHome.toFixed(2)} on ${row.home_team}`,
-      `${books.length} books priced`,
     ],
     homeWin,
     draw,
@@ -96,13 +95,19 @@ export async function fetchSportMatches(sport: SportId): Promise<MatchesPayload>
 
   const supabase = createClient<Database>(url, key, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => {
+      const headers = new Headers(init?.headers);
+      if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
+      headers.set("apikey", key);
+      return fetch(input, { ...init, headers });
+    } },
   });
 
   const cutoff = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
   const { data, error } = await supabase
     .from("matches")
     .select(
-      "id, sport, league, commence_time, home_team, away_team, status, home_score, away_score, books",
+      "id, sport, league, commence_time, home_team, away_team, status, home_score, away_score, books, probabilities",
     )
     .eq("sport", sport)
     .gte("commence_time", cutoff)

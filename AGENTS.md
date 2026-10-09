@@ -10,3 +10,5 @@
 <!-- LOVABLE:END -->
  
 Analytics presentation remains separate from stored bookmaker inputs so promotions can be hidden without changing fixture calculations or payment logic.
+Use the shared sports directory for navigation and server validation so every supported sport is selectable and loadable.
+Read explicit match probability distributions before legacy price-derived probabilities so analytics-only fixtures do not require bookmaker data.

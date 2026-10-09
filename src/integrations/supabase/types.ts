@@ -78,6 +78,7 @@ export type Database = {
           home_team: string
           id: string
           league: string
+          probabilities: Json | null
           sport: string
           status: string
           updated_at: string
@@ -92,6 +93,7 @@ export type Database = {
           home_team: string
           id?: string
           league: string
+          probabilities?: Json | null
           sport: string
           status?: string
           updated_at?: string
@@ -106,6 +108,7 @@ export type Database = {
           home_team?: string
           id?: string
           league?: string
+          probabilities?: Json | null
           sport?: string
           status?: string
           updated_at?: string
