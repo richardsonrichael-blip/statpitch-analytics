@@ -6,7 +6,7 @@ export function OddsBoard({ probability, selection, label }: {
   seed: string;
   selection: string;
   label?: string;
-  books?: BookPrice[];
+  books?: BookPrice[] | undefined;
   side?: "home" | "draw" | "away";
 }) {
   return (

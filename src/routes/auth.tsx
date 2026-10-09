@@ -9,7 +9,7 @@ export const Route = createFileRoute("/auth")({
   head: () => {
     const title = "Sign In — StatPitch Analytics";
     const description =
-      "Sign in or create a StatPitch Analytics account to unlock Pro football models, value bet edges and AI predictions.";
+      "Sign in or create a StatPitch Analytics account to unlock Pro sports models, match probabilities and AI predictions.";
     return {
       meta: [
         { title },
