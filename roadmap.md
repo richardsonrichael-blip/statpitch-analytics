@@ -1,6 +1,6 @@
 - [x] Hide betting promotions and bookmaker references; show analytical labels.
 - [x] Update subscription windows to Unlock Pro Analytics.
 - [x] Verify phone and desktop views.
-- [ ] Add Baseball, Handball, Water Polo, Snooker, Badminton and Esports to the sports navigation.
-- [ ] Render match information and win probabilities for each new sport without odds or betting links.
-- [ ] Verify all six sports and phone navigation.
+- [x] Add Baseball, Handball, Water Polo, Snooker, Badminton and Esports to the sports navigation.
+- [x] Render match information and win probabilities for each new sport without odds or betting links.
+- [x] Verify all six sports and phone navigation.
