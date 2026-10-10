@@ -94,7 +94,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
             <p className="text-sm text-muted-foreground">Not available for this fixture yet.</p>
           )}
           <OddsBoard
-            probability={fixture.homeWin}
+            probability={hasProb ? fixture.homeWin : null}
             seed={`${fixture.id}-home`}
             books={fixture.books}
             side="home"
@@ -108,7 +108,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
             Team Analytics
           </p>
           <OddsBoard
-            probability={fixture.awayWin}
+            probability={hasProb ? fixture.awayWin : null}
             seed={`${fixture.id}-away`}
             books={fixture.books}
             side="away"
