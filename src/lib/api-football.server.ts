@@ -50,20 +50,22 @@ async function fetchMatchWinnerOdds(key: string, day: string) {
       }
       totalPages = Math.max(1, json.paging?.total ?? 1);
       for (const entry of json.response) {
-      for (const bookmaker of entry.bookmakers) {
-        const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
-        if (!bet) continue;
-        const home = Number(bet.values.find((v) => v.value === "Home")?.odd);
-        const draw = Number(bet.values.find((v) => v.value === "Draw")?.odd);
-        const away = Number(bet.values.find((v) => v.value === "Away")?.odd);
-        if (!(home > 1) || !(draw > 1) || !(away > 1)) continue;
-        const slot = byFixture.get(entry.fixture.id) ?? { home: [], draw: [], away: [] };
-        slot.home.push(home);
-        slot.draw.push(draw);
-        slot.away.push(away);
-        byFixture.set(entry.fixture.id, slot);
+        for (const bookmaker of entry.bookmakers) {
+          const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
+          if (!bet) continue;
+          const home = Number(bet.values.find((v) => v.value === "Home")?.odd);
+          const draw = Number(bet.values.find((v) => v.value === "Draw")?.odd);
+          const away = Number(bet.values.find((v) => v.value === "Away")?.odd);
+          if (!(home > 1) || !(draw > 1) || !(away > 1)) continue;
+          const slot = byFixture.get(entry.fixture.id) ?? { home: [], draw: [], away: [] };
+          slot.home.push(home);
+          slot.draw.push(draw);
+          slot.away.push(away);
+          byFixture.set(entry.fixture.id, slot);
+        }
       }
-    }
+      page += 1;
+    } while (page <= totalPages);
   } catch (e) {
     console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
   }
