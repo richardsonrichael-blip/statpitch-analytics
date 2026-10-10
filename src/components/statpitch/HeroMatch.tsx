@@ -48,6 +48,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
   const isLive = fixture.status === "IN_PLAY";
   const favourite = fixture.homeWin >= fixture.awayWin ? fixture.home : fixture.away;
   const favouriteProb = Math.max(fixture.homeWin, fixture.awayWin);
+  const hasProb = fixture.probabilitiesAvailable !== false;
 
   return (
     <section className="pitch-hero relative overflow-hidden rounded-3xl border border-border p-5 card-shadow sm:p-7">
@@ -67,13 +68,15 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
             {fixture.homeScore !== null && fixture.awayScore !== null
               ? `Score ${fixture.homeScore} - ${fixture.awayScore} · `
               : ""}
-            Highest win probability · {favourite}
+            {hasProb ? `Highest win probability · ${favourite}` : "Live fixture data"}
           </p>
         </div>
-        <div className="hidden text-right sm:block">
-          <p className="text-4xl font-bold text-neon tabular-nums">{favouriteProb}%</p>
-          <p className="text-xs text-muted-foreground">Win probability</p>
-        </div>
+        {hasProb && (
+          <div className="hidden text-right sm:block">
+            <p className="text-4xl font-bold text-neon tabular-nums">{favouriteProb}%</p>
+            <p className="text-xs text-muted-foreground">Win probability</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -81,11 +84,15 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Win Probability %
           </p>
-          <div className="space-y-2.5">
-            <Bar label={fixture.home} value={fixture.homeWin} />
-            {fixture.draw > 0 && <Bar label="Draw" value={fixture.draw} tone="muted" />}
-            <Bar label={fixture.away} value={fixture.awayWin} tone="muted" />
-          </div>
+          {hasProb ? (
+            <div className="space-y-2.5">
+              <Bar label={fixture.home} value={fixture.homeWin} />
+              {fixture.draw > 0 && <Bar label="Draw" value={fixture.draw} tone="muted" />}
+              <Bar label={fixture.away} value={fixture.awayWin} tone="muted" />
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Not available for this fixture yet.</p>
+          )}
           <OddsBoard
             probability={fixture.homeWin}
             seed={`${fixture.id}-home`}
