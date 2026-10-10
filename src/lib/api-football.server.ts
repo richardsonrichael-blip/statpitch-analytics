@@ -20,6 +20,64 @@ function mapStatus(short: string) {
   return "TIMED";
 }
 
+type ApiOdds = {
+  fixture: { id: number };
+  bookmakers: {
+    bets: { name: string; values: { value: string; odd: string }[] }[];
+  }[];
+};
+
+/** Median 1X2 odds per fixture from the odds feed (one extra request per cache cycle). */
+async function fetchMatchWinnerOdds(key: string, day: string) {
+  const byFixture = new Map<number, { home: number[]; draw: number[]; away: number[] }>();
+  try {
+    const res = await fetch(`https://v3.football.api-sports.io/odds?date=${day}`, {
+      headers: { "x-apisports-key": key },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = (await res.json()) as { errors: unknown; response: ApiOdds[] };
+    const errs = json.errors;
+    if (errs && !Array.isArray(errs) && Object.keys(errs as object).length) {
+      throw new Error(JSON.stringify(errs));
+    }
+    for (const entry of json.response) {
+      for (const bookmaker of entry.bookmakers) {
+        const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
+        if (!bet) continue;
+        const home = Number(bet.values.find((v) => v.value === "Home")?.odd);
+        const draw = Number(bet.values.find((v) => v.value === "Draw")?.odd);
+        const away = Number(bet.values.find((v) => v.value === "Away")?.odd);
+        if (!(home > 1) || !(draw > 1) || !(away > 1)) continue;
+        const slot = byFixture.get(entry.fixture.id) ?? { home: [], draw: [], away: [] };
+        slot.home.push(home);
+        slot.draw.push(draw);
+        slot.away.push(away);
+        byFixture.set(entry.fixture.id, slot);
+      }
+    }
+  } catch (e) {
+    console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
+  }
+  return byFixture;
+}
+
+function median(values: number[]) {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? (sorted[mid] ?? 0) : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
+}
+
+/** Implied Probability % = (1 / Odds) x 100, with the bookmaker margin removed. */
+function deVig(home: number, draw: number, away: number) {
+  const raw = [1 / home, 1 / draw, 1 / away];
+  const total = raw.reduce((a, b) => a + b, 0);
+  const pct = raw.map((r) => Math.round((r / total) * 100));
+  const drift = 100 - pct.reduce((a, b) => a + b, 0);
+  pct[0] = (pct[0] ?? 0) + drift;
+  return { homeWin: pct[0] ?? 0, draw: pct[1] ?? 0, awayWin: pct[2] ?? 0 };
+}
+
 /** Today's real football fixtures. Returns null when the feed is unavailable. */
 export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
   const key = process.env["API_FOOTBALL_KEY"];
