@@ -12,3 +12,4 @@
 Analytics presentation remains separate from stored bookmaker inputs so promotions can be hidden without changing fixture calculations or payment logic.
 Use the shared sports directory for navigation and server validation so every supported sport is selectable and loadable.
 Read explicit match probability distributions before legacy price-derived probabilities so analytics-only fixtures do not require bookmaker data.
+- Football fixtures come from API-Football server-side (15-min cache, 100 req/day plan) and fall back to the matches table; the key stays server-only so it is never shipped to browsers.

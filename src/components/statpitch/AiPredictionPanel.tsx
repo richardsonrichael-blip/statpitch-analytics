@@ -26,7 +26,7 @@ export function AiPredictionPanel({ fixture }: { fixture: LiveFixture }) {
   const favouriteProb = Math.max(fixture.homeWin, fixture.awayWin);
 
   const pick = prediction?.recommendedPick ?? favourite;
-  const confidence = prediction ? `${prediction.confidence}%` : `${favouriteProb}%`;
+  const confidence = prediction ? `${prediction.confidence}%` : fixture.probabilitiesAvailable === false ? "N/A" : `${favouriteProb}%`;
   const score = prediction?.predictedScore ?? "—";
   const edge = prediction ? `${prediction.valueEdge.toFixed(1)}%` : "—";
 

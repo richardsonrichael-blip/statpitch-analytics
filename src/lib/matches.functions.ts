@@ -10,6 +10,11 @@ export const getMatches = createServerFn({ method: "GET" })
     sport: input?.sport && SPORTS.includes(input.sport) ? input.sport : ("football" as SportId),
   }))
   .handler(async ({ data }): Promise<MatchesPayload> => {
+    if (data.sport === "football") {
+      const { fetchTodayFootball } = await import("./api-football.server");
+      const live = await fetchTodayFootball();
+      if (live && live.fixtures.length > 0) return live;
+    }
     const { fetchSportMatches } = await import("./matches.server");
     return fetchSportMatches(data.sport);
   });

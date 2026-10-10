@@ -139,7 +139,10 @@ function Index() {
             {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
             {tab === "H2H Comparison" && <H2HTab />}
             {tab === "Probability Analytics" && (
-              <ValueBetsTab key={sport} fixtures={sportFixtures} />
+              <ValueBetsTab
+                key={sport}
+                fixtures={sportFixtures.filter((f) => f.probabilitiesAvailable !== false)}
+              />
             )}
           </>
         )}
