@@ -48,7 +48,8 @@ async function fetchMatchWinnerOdds(key: string, day: string) {
       if (errs && !Array.isArray(errs) && Object.keys(errs as object).length) {
         throw new Error(JSON.stringify(errs));
       }
-      totalPages = Math.max(1, json.paging?.total ?? 1);
+      // Cap at 10 pages (100 fixtures) per cycle to protect the daily request quota.
+      totalPages = Math.min(10, Math.max(1, json.paging?.total ?? 1));
       for (const entry of json.response) {
         for (const bookmaker of entry.bookmakers) {
           const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
