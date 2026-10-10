@@ -31,16 +31,25 @@ type ApiOdds = {
 async function fetchMatchWinnerOdds(key: string, day: string) {
   const byFixture = new Map<number, { home: number[]; draw: number[]; away: number[] }>();
   try {
-    const res = await fetch(`https://v3.football.api-sports.io/odds?date=${day}`, {
-      headers: { "x-apisports-key": key },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = (await res.json()) as { errors: unknown; response: ApiOdds[] };
-    const errs = json.errors;
-    if (errs && !Array.isArray(errs) && Object.keys(errs as object).length) {
-      throw new Error(JSON.stringify(errs));
-    }
-    for (const entry of json.response) {
+    // The feed paginates (10 per page); walk every page once per cache cycle.
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const res = await fetch(`https://v3.football.api-sports.io/odds?date=${day}&page=${page}`, {
+        headers: { "x-apisports-key": key },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as {
+        errors: unknown;
+        response: ApiOdds[];
+        paging?: { total?: number };
+      };
+      const errs = json.errors;
+      if (errs && !Array.isArray(errs) && Object.keys(errs as object).length) {
+        throw new Error(JSON.stringify(errs));
+      }
+      totalPages = Math.max(1, json.paging?.total ?? 1);
+      for (const entry of json.response) {
       for (const bookmaker of entry.bookmakers) {
         const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
         if (!bet) continue;
