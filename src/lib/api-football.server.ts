@@ -96,10 +96,16 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
       throw new Error(JSON.stringify(errs));
     }
 
+    const oddsByFixture = await fetchMatchWinnerOdds(key, day);
+
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
     const fixtures: LiveFixture[] = json.response
       .map((f) => {
         const status = mapStatus(f.fixture.status.short);
+        const odds = oddsByFixture.get(f.fixture.id);
+        const probabilities = odds
+          ? deVig(median(odds.home), median(odds.draw), median(odds.away))
+          : null;
         return {
           id: `af-${f.fixture.id}`,
           league: `${f.league.name} · ${f.league.country}`,
