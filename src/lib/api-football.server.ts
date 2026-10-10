@@ -20,6 +20,77 @@ function mapStatus(short: string) {
   return "TIMED";
 }
 
+type ApiOdds = {
+  fixture: { id: number };
+  bookmakers: {
+    bets: { name: string; values: { value: string; odd: string }[] }[];
+  }[];
+};
+
+/** Median 1X2 odds per fixture; stops paginating once every wanted fixture is covered. */
+async function fetchMatchWinnerOdds(key: string, day: string, wanted: Set<number>) {
+  const byFixture = new Map<number, { home: number[]; draw: number[]; away: number[] }>();
+  if (wanted.size === 0) return byFixture;
+  try {
+    // The feed paginates (10 per page); stop early when all wanted fixtures have odds.
+    let page = 1;
+    let totalPages = 1;
+    do {
+      const res = await fetch(`https://v3.football.api-sports.io/odds?date=${day}&page=${page}`, {
+        headers: { "x-apisports-key": key },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as {
+        errors: unknown;
+        response: ApiOdds[];
+        paging?: { total?: number };
+      };
+      const errs = json.errors;
+      if (errs && !Array.isArray(errs) && Object.keys(errs as object).length) {
+        throw new Error(JSON.stringify(errs));
+      }
+      // Cap at 12 pages per cycle to protect the daily request quota.
+      totalPages = Math.min(12, Math.max(1, json.paging?.total ?? 1));
+      for (const entry of json.response) {
+        for (const bookmaker of entry.bookmakers) {
+          const bet = bookmaker.bets.find((b) => b.name === "Match Winner");
+          if (!bet) continue;
+          const home = Number(bet.values.find((v) => v.value === "Home")?.odd);
+          const draw = Number(bet.values.find((v) => v.value === "Draw")?.odd);
+          const away = Number(bet.values.find((v) => v.value === "Away")?.odd);
+          if (!(home > 1) || !(draw > 1) || !(away > 1)) continue;
+          const slot = byFixture.get(entry.fixture.id) ?? { home: [], draw: [], away: [] };
+          slot.home.push(home);
+          slot.draw.push(draw);
+          slot.away.push(away);
+          byFixture.set(entry.fixture.id, slot);
+        }
+      }
+      page += 1;
+    } while (page <= totalPages && ![...wanted].every((id) => byFixture.has(id)));
+  } catch (e) {
+    console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
+  }
+  return byFixture;
+}
+
+function median(values: number[]) {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? (sorted[mid] ?? 0) : ((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2;
+}
+
+/** Implied Probability % = (1 / Odds) x 100, with the bookmaker margin removed. */
+function deVig(home: number, draw: number, away: number) {
+  const raw = [1 / home, 1 / draw, 1 / away];
+  const total = raw.reduce((a, b) => a + b, 0);
+  const pct = raw.map((r) => Math.round((r / total) * 100));
+  const drift = 100 - pct.reduce((a, b) => a + b, 0);
+  pct[0] = (pct[0] ?? 0) + drift;
+  return { homeWin: pct[0] ?? 0, draw: pct[1] ?? 0, awayWin: pct[2] ?? 0 };
+}
+
 /** Today's real football fixtures. Returns null when the feed is unavailable. */
 export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
   const key = process.env["API_FOOTBALL_KEY"];
@@ -39,9 +110,23 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
     }
 
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
-    const fixtures: LiveFixture[] = json.response
-      .map((f) => {
-        const status = mapStatus(f.fixture.status.short);
+    const selected = json.response
+      .map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }))
+      .sort((a, b) => rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date))
+      .slice(0, 40);
+
+    const oddsByFixture = await fetchMatchWinnerOdds(
+      key,
+      day,
+      new Set(selected.map((s) => s.raw.fixture.id)),
+    );
+
+    const fixtures: LiveFixture[] = selected
+      .map(({ raw: f, status }) => {
+        const odds = oddsByFixture.get(f.fixture.id);
+        const probabilities = odds
+          ? deVig(median(odds.home), median(odds.draw), median(odds.away))
+          : null;
         return {
           id: `af-${f.fixture.id}`,
           league: `${f.league.name} · ${f.league.country}`,
@@ -54,11 +139,11 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           homeScore: f.goals.home,
           awayScore: f.goals.away,
           pills: [f.league.name, status === "IN_PLAY" ? "In play" : status === "FINISHED" ? "Full time" : "Upcoming"],
-          // API-Football fixtures carry no probabilities; never invent them.
-          homeWin: 0,
-          draw: 0,
-          awayWin: 0,
-          probabilitiesAvailable: false,
+          // Probabilities come only from real 1X2 odds; never invent them.
+          homeWin: probabilities?.homeWin ?? 0,
+          draw: probabilities?.draw ?? 0,
+          awayWin: probabilities?.awayWin ?? 0,
+          probabilitiesAvailable: probabilities !== null,
           books: [],
         } satisfies LiveFixture;
       })
