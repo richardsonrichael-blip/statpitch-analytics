@@ -27,11 +27,12 @@ type ApiOdds = {
   }[];
 };
 
-/** Median 1X2 odds per fixture from the odds feed (one extra request per cache cycle). */
-async function fetchMatchWinnerOdds(key: string, day: string) {
+/** Median 1X2 odds per fixture; stops paginating once every wanted fixture is covered. */
+async function fetchMatchWinnerOdds(key: string, day: string, wanted: Set<number>) {
   const byFixture = new Map<number, { home: number[]; draw: number[]; away: number[] }>();
+  if (wanted.size === 0) return byFixture;
   try {
-    // The feed paginates (10 per page); walk every page once per cache cycle.
+    // The feed paginates (10 per page); stop early when all wanted fixtures have odds.
     let page = 1;
     let totalPages = 1;
     do {
