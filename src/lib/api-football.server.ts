@@ -109,12 +109,20 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
       throw new Error(JSON.stringify(errs));
     }
 
-    const oddsByFixture = await fetchMatchWinnerOdds(key, day);
-
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
-    const fixtures: LiveFixture[] = json.response
-      .map((f) => {
-        const status = mapStatus(f.fixture.status.short);
+    const selected = json.response
+      .map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }))
+      .sort((a, b) => rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date))
+      .slice(0, 40);
+
+    const oddsByFixture = await fetchMatchWinnerOdds(
+      key,
+      day,
+      new Set(selected.map((s) => s.raw.fixture.id)),
+    );
+
+    const fixtures: LiveFixture[] = selected
+      .map(({ raw: f, status }) => {
         const odds = oddsByFixture.get(f.fixture.id);
         const probabilities = odds
           ? deVig(median(odds.home), median(odds.draw), median(odds.away))
