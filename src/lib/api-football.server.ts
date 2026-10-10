@@ -118,11 +118,11 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           homeScore: f.goals.home,
           awayScore: f.goals.away,
           pills: [f.league.name, status === "IN_PLAY" ? "In play" : status === "FINISHED" ? "Full time" : "Upcoming"],
-          // API-Football fixtures carry no probabilities; never invent them.
-          homeWin: 0,
-          draw: 0,
-          awayWin: 0,
-          probabilitiesAvailable: false,
+          // Probabilities come only from real 1X2 odds; never invent them.
+          homeWin: probabilities?.homeWin ?? 0,
+          draw: probabilities?.draw ?? 0,
+          awayWin: probabilities?.awayWin ?? 0,
+          probabilitiesAvailable: probabilities !== null,
           books: [],
         } satisfies LiveFixture;
       })
