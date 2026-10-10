@@ -24,6 +24,8 @@ export type LiveFixture = {
   awayWin: number;
   /** Live prices from real bookmakers, when the odds feed supplies them. */
   books?: BookPrice[];
+  /** False when the data source supplies no win probabilities. */
+  probabilitiesAvailable?: boolean;
 };
 
 export type MatchesPayload = {
