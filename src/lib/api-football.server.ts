@@ -146,9 +146,7 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           probabilitiesAvailable: probabilities !== null,
           books: [],
         } satisfies LiveFixture;
-      })
-      .sort((a, b) => rank(a.status) - rank(b.status) || a.utcDate.localeCompare(b.utcDate))
-      .slice(0, 40);
+      });
 
     const payload: MatchesPayload = {
       source: "live",
