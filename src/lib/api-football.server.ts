@@ -8,7 +8,7 @@ const LIVE = new Set(["1H", "HT", "2H", "ET", "BT", "P", "LIVE", "INT", "SUSP"])
 const DONE = new Set(["FT", "AET", "PEN"]);
 
 type ApiFixture = {
-  fixture: { id: number; date: string; status: { short: string } };
+  fixture: { id: number; date: string; status: { short: string; elapsed?: number | null; extra?: number | null } };
   league: { name: string; country: string };
   teams: { home: { name: string; logo: string }; away: { name: string; logo: string } };
   goals: { home: number | null; away: number | null };
@@ -120,15 +120,18 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
     const oddsByFixture = await fetchMatchWinnerOdds(key, day);
 
     // Prefer matches that carry odds (so they show win percentages), then live, then earliest.
-    const selected = json.response
-      .map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }))
+    const mapped = json.response.map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }));
+    // Every in-play match is always kept; remaining slots go to matches with odds, then earliest.
+    const liveAll = mapped.filter((m) => m.status === "IN_PLAY");
+    const others = mapped.filter((m) => m.status !== "IN_PLAY");
+    const selected = [...liveAll, ...others
       .sort(
         (a, b) =>
           Number(oddsByFixture.has(b.raw.fixture.id)) - Number(oddsByFixture.has(a.raw.fixture.id)) ||
           rank(a.status) - rank(b.status) ||
           a.raw.fixture.date.localeCompare(b.raw.fixture.date),
       )
-      .slice(0, 40)
+      .slice(0, Math.max(0, 40 - liveAll.length))]
       .sort(
         (a, b) =>
           rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date),
@@ -151,6 +154,9 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           awayCrest: f.teams.away.logo || null,
           homeScore: f.goals.home,
           awayScore: f.goals.away,
+          statusShort: f.fixture.status.short,
+          minute: f.fixture.status.elapsed ?? null,
+          minuteExtra: f.fixture.status.extra ?? null,
           pills: [f.league.name, status === "IN_PLAY" ? "In play" : status === "FINISHED" ? "Full time" : "Upcoming"],
           // Probabilities come only from real 1X2 odds; never invent them.
           homeWin: probabilities?.homeWin ?? 0,

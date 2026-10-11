@@ -34,6 +34,7 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-neon: var(--neon);
   --color-neon-dim: var(--neon-dim);
+  --color-success: var(--success);
   --color-warn: var(--warn);
   --font-display: "Bebas Neue", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Barlow", ui-sans-serif, system-ui, sans-serif;
@@ -53,6 +54,7 @@
   /* premium gold #e7b855 */
   --neon: oklch(0.81 0.115 82);
   --neon-dim: oklch(0.68 0.1 80);
+  --success: oklch(0.78 0.2 150);
   --primary: oklch(0.81 0.115 82);
   --primary-foreground: oklch(0.16 0.008 70);
   --secondary: oklch(0.26 0.012 70);
