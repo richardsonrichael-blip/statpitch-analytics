@@ -73,7 +73,8 @@ async function fetchMatchWinnerOdds(key: string, day: string) {
         }
       }
       page += 1;
-    } while (page <= totalPages && ![...wanted].every((id) => byFixture.has(id)));
+    } while (page <= totalPages);
+    oddsCache = { at: Date.now(), day, map: byFixture };
   } catch (e) {
     console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
   }
