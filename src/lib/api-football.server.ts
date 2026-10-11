@@ -117,16 +117,22 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
     }
 
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
+    const oddsByFixture = await fetchMatchWinnerOdds(key, day);
+
+    // Prefer matches that carry odds (so they show win percentages), then live, then earliest.
     const selected = json.response
       .map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }))
-      .sort((a, b) => rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date))
-      .slice(0, 40);
-
-    const oddsByFixture = await fetchMatchWinnerOdds(
-      key,
-      day,
-      new Set(selected.map((s) => s.raw.fixture.id)),
-    );
+      .sort(
+        (a, b) =>
+          Number(oddsByFixture.has(b.raw.fixture.id)) - Number(oddsByFixture.has(a.raw.fixture.id)) ||
+          rank(a.status) - rank(b.status) ||
+          a.raw.fixture.date.localeCompare(b.raw.fixture.date),
+      )
+      .slice(0, 40)
+      .sort(
+        (a, b) =>
+          rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date),
+      );
 
     const fixtures: LiveFixture[] = selected
       .map(({ raw: f, status }) => {
