@@ -19,6 +19,10 @@ export type LiveFixture = {
   homeScore: number | null;
   awayScore: number | null;
   pills: string[];
+  /** Raw provider status (e.g. 1H, HT, 2H) and current match minute when live. */
+  statusShort?: string;
+  minute?: number | null;
+  minuteExtra?: number | null;
   homeWin: number;
   draw: number;
   awayWin: number;
