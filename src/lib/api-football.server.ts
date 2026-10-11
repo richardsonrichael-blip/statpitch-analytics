@@ -27,12 +27,18 @@ type ApiOdds = {
   }[];
 };
 
-/** Median 1X2 odds per fixture; stops paginating once every wanted fixture is covered. */
-async function fetchMatchWinnerOdds(key: string, day: string, wanted: Set<number>) {
+/** Odds change slowly, so cache them for 6 hours to protect the 100 req/day plan. */
+const ODDS_CACHE_MS = 6 * 60 * 60 * 1000;
+let oddsCache: { at: number; day: string; map: Map<number, { home: number[]; draw: number[]; away: number[] }> } | null = null;
+
+/** Median 1X2 odds per fixture from the odds feed. */
+async function fetchMatchWinnerOdds(key: string, day: string) {
+  if (oddsCache && oddsCache.day === day && Date.now() - oddsCache.at < ODDS_CACHE_MS) {
+    return oddsCache.map;
+  }
   const byFixture = new Map<number, { home: number[]; draw: number[]; away: number[] }>();
-  if (wanted.size === 0) return byFixture;
   try {
-    // The feed paginates (10 per page); stop early when all wanted fixtures have odds.
+    // The feed paginates (10 per page); cap pages to protect the daily request quota.
     let page = 1;
     let totalPages = 1;
     do {
@@ -67,11 +73,12 @@ async function fetchMatchWinnerOdds(key: string, day: string, wanted: Set<number
         }
       }
       page += 1;
-    } while (page <= totalPages && ![...wanted].every((id) => byFixture.has(id)));
+    } while (page <= totalPages);
+    oddsCache = { at: Date.now(), day, map: byFixture };
   } catch (e) {
     console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
   }
-  return byFixture;
+  return oddsCache?.map ?? byFixture;
 }
 
 function median(values: number[]) {
@@ -110,16 +117,22 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
     }
 
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
+    const oddsByFixture = await fetchMatchWinnerOdds(key, day);
+
+    // Prefer matches that carry odds (so they show win percentages), then live, then earliest.
     const selected = json.response
       .map((f) => ({ raw: f, status: mapStatus(f.fixture.status.short) }))
-      .sort((a, b) => rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date))
-      .slice(0, 40);
-
-    const oddsByFixture = await fetchMatchWinnerOdds(
-      key,
-      day,
-      new Set(selected.map((s) => s.raw.fixture.id)),
-    );
+      .sort(
+        (a, b) =>
+          Number(oddsByFixture.has(b.raw.fixture.id)) - Number(oddsByFixture.has(a.raw.fixture.id)) ||
+          rank(a.status) - rank(b.status) ||
+          a.raw.fixture.date.localeCompare(b.raw.fixture.date),
+      )
+      .slice(0, 40)
+      .sort(
+        (a, b) =>
+          rank(a.status) - rank(b.status) || a.raw.fixture.date.localeCompare(b.raw.fixture.date),
+      );
 
     const fixtures: LiveFixture[] = selected
       .map(({ raw: f, status }) => {
@@ -146,9 +159,7 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           probabilitiesAvailable: probabilities !== null,
           books: [],
         } satisfies LiveFixture;
-      })
-      .sort((a, b) => rank(a.status) - rank(b.status) || a.utcDate.localeCompare(b.utcDate))
-      .slice(0, 40);
+      });
 
     const payload: MatchesPayload = {
       source: "live",
