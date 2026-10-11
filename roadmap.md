@@ -4,3 +4,5 @@
 - [x] Add Baseball, Handball, Water Polo, Snooker, Badminton and Esports to the sports navigation.
 - [x] Render match information and win probabilities for each new sport without odds or betting links.
 - [x] Verify all six sports and phone navigation.
+- [ ] Collapse unavailable card badges and analytics; verify card layouts.
+- [ ] Enable one-minute live updates after resolving the football feed's daily request limit.
