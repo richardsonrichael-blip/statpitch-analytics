@@ -78,7 +78,7 @@ async function fetchMatchWinnerOdds(key: string, day: string) {
   } catch (e) {
     console.error("API-Football odds fetch failed", e instanceof Error ? e.message : e);
   }
-  return byFixture;
+  return oddsCache?.map ?? byFixture;
 }
 
 function median(values: number[]) {
