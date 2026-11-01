@@ -1,6 +1,7 @@
 import type { LiveFixture } from "@/data/mock-live";
 import { ProLock } from "@/components/statpitch/ProLock";
 import { useAiPrediction } from "@/hooks/useAiPredictions";
+import { hasMatchProbabilities } from "@/lib/match-probabilities";
 
 function Cell({ label, value, tone }: { label: string; value: string; tone?: "neon" }) {
   return (
@@ -25,26 +26,22 @@ export function AiPredictionPanel({ fixture }: { fixture: LiveFixture }) {
   const favourite = fixture.homeWin >= fixture.awayWin ? fixture.home : fixture.away;
   const favouriteProb = Math.max(fixture.homeWin, fixture.awayWin);
 
-  const pick = prediction?.recommendedPick ?? favourite;
-  const confidence = prediction ? `${prediction.confidence}%` : fixture.probabilitiesAvailable === false ? "N/A" : `${favouriteProb}%`;
-  const score = prediction?.predictedScore ?? "—";
-  const edge = prediction ? `${prediction.valueEdge.toFixed(1)}%` : "—";
+  const hasProb = hasMatchProbabilities(fixture);
+  const pick = prediction?.recommendedPick ?? (hasProb ? favourite : null);
+  const confidence = prediction ? `${prediction.confidence}%` : hasProb ? `${favouriteProb}%` : null;
 
   return (
     <ProLock feature="AI match prediction" cta="Unlock">
       <div className="rounded-2xl border border-border bg-surface/70 p-4">
-        <div className="grid gap-4 sm:grid-cols-4">
-          <Cell label="Projected winner" value={pick} />
-          <Cell label="Predicted score" value={score} />
-          <Cell label="Confidence" value={confidence} tone="neon" />
-          <Cell label="Probability advantage" value={edge} tone="neon" />
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          {loading
-            ? "Loading model output…"
-            : (prediction?.modelNote ??
-              "Model blends recent form, expected goals and match performance.")}
-        </p>
+        {(pick || prediction || confidence) && <div className="flex flex-wrap gap-x-6 gap-y-4 [&>div]:min-w-0 [&>div]:flex-1 [&>div]:basis-32 [&>div]:break-words">
+          {pick && <Cell label="Projected winner" value={pick} />}
+          {prediction?.predictedScore && <Cell label="Predicted score" value={prediction.predictedScore} />}
+          {confidence && <Cell label="Confidence" value={confidence} tone="neon" />}
+          {prediction && <Cell label="Probability advantage" value={`${prediction.valueEdge.toFixed(1)}%`} tone="neon" />}
+        </div>}
+        {(loading || prediction?.modelNote || !pick) && <p className="mt-3 text-xs text-muted-foreground">
+          {loading ? "Loading model output…" : prediction?.modelNote ?? "No model prediction available for this fixture yet."}
+        </p>}
       </div>
     </ProLock>
   );

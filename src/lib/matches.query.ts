@@ -7,6 +7,9 @@ export function matchesQuery(sport: SportId = "football") {
     queryKey: ["matches", sport],
     queryFn: () => getMatches({ data: { sport } }),
     staleTime: 60_000,
+     // Recheck while the page is visible, without exceeding the feed cache cadence.
+     refetchInterval: sport === "football" ? 15 * 60_000 : false,
+     refetchIntervalInBackground: false,
   });
 }
 

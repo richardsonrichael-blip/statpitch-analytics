@@ -1,7 +1,7 @@
 import { describe, test } from "node:test";
 import { strict as assert } from "node:assert";
 import { SPORTS } from "../data/sports";
-import { readMatchProbabilities } from "./match-probabilities";
+import { hasMatchProbabilities, readMatchProbabilities } from "./match-probabilities";
 
 describe("additional sports", () => {
   for (const [id, label] of [
@@ -23,4 +23,11 @@ test("missing or invalid analytics are not invented", () => {
   for (const value of [null, {}, { homeWin: 60, draw: 0, awayWin: 60 }, { homeWin: -1, draw: 0, awayWin: 101 }]) {
     assert.equal(readMatchProbabilities(value), null);
   }
+});
+
+test("unavailable fixture probabilities are excluded", () => {
+  assert.equal(hasMatchProbabilities({ homeWin: 50, draw: 0, awayWin: 50, probabilitiesAvailable: false }), false);
+  assert.equal(hasMatchProbabilities({ homeWin: 0, draw: 0, awayWin: 0 }), false);
+  assert.equal(hasMatchProbabilities({ homeWin: Number.NaN, draw: 0, awayWin: 50 }), false);
+  assert.equal(hasMatchProbabilities({ homeWin: 48, draw: 0, awayWin: 52 }), true);
 });
