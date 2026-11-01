@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { AppHeader } from "@/components/statpitch/AppHeader";
 import { matchesQueryOptions } from "@/lib/matches.query";
 import { getTeamProfile } from "@/lib/team-directory";
+import { TeamCrest } from "@/components/statpitch/TeamCrest";
 
 export const Route = createFileRoute("/team/$teamName")({
   head: ({ params }) => {
@@ -66,15 +67,9 @@ function TeamPage() {
           <>
             <section className="rounded-3xl border border-border bg-surface p-5 card-shadow sm:p-7">
               <div className="flex items-center gap-3">
-                {profile.crest ? (
-                  <img src={profile.crest} alt={`${profile.name} crest`} className="size-12 object-contain" />
-                ) : (
-                  <span className="grid size-12 place-items-center rounded-xl bg-muted text-sm font-bold text-muted-foreground">
-                    {profile.name.slice(0, 2).toUpperCase()}
-                  </span>
-                )}
-                <div>
-                  <h2 className="text-xl font-bold sm:text-2xl">{profile.name}</h2>
+                <TeamCrest src={profile.crest} name={profile.name} className="size-12" />
+                <div className="min-w-0">
+                  <h2 className="break-words text-xl font-bold [overflow-wrap:anywhere] sm:text-2xl">{profile.name}</h2>
                   <p className="text-xs text-muted-foreground">
                     {profile.leagues.join(" · ") || "Football"}
                   </p>

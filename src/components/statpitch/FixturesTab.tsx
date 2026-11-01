@@ -1,7 +1,7 @@
 import type { LiveFixture } from "@/data/mock-live";
-import { OddsBoard } from "@/components/statpitch/OddsPanel";
-
-const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE"];
+import { TeamCrest } from "@/components/statpitch/TeamCrest";
+import { isLiveFixture } from "@/components/statpitch/LiveRail";
+import { hasMatchProbabilities } from "@/lib/match-probabilities";
 
 function formatKickoff(iso: string) {
   const d = new Date(iso);
@@ -10,17 +10,6 @@ function formatKickoff(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-function Crest({ src, name }: { src: string | null; name: string }) {
-  if (!src) {
-    return (
-      <span className="grid size-6 place-items-center rounded-md bg-muted text-[10px] font-bold text-muted-foreground">
-        {name.slice(0, 2).toUpperCase()}
-      </span>
-    );
-  }
-  return <img src={src} alt={`${name} crest`} loading="lazy" className="size-6 object-contain" />;
 }
 
 export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
@@ -35,27 +24,25 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {fixtures.map((f) => {
-        const isLive = LIVE_STATUSES.includes(f.status);
+        const isLive = isLiveFixture(f);
         const hasScore = f.homeScore !== null && f.awayScore !== null;
         return (
           <article
             key={f.id}
-            className="rounded-2xl border border-border bg-surface p-5 transition hover:border-neon/40 card-shadow"
+            className="min-w-0 rounded-lg border border-border bg-surface p-5 transition hover:border-neon/40 card-shadow"
           >
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="font-semibold uppercase tracking-widest">{f.league}</span>
               <span className={isLive ? "font-bold text-neon" : ""}>
                 {isLive ? "Live" : formatKickoff(f.utcDate)}
               </span>
             </div>
 
-            <div className="mt-3 flex items-center justify-between gap-3">
-              <h3 className="flex flex-wrap items-center gap-2 text-base font-bold sm:text-lg">
-                <Crest src={f.homeCrest} name={f.home} />
-                {f.home}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-base font-bold sm:text-lg">
+                <span className="flex min-w-0 items-center gap-2"><TeamCrest src={f.homeCrest} name={f.home} /><span className="break-words [overflow-wrap:anywhere]">{f.home}</span></span>
                 <span className="text-muted-foreground">vs</span>
-                <Crest src={f.awayCrest} name={f.away} />
-                {f.away}
+                <span className="flex min-w-0 items-center gap-2"><TeamCrest src={f.awayCrest} name={f.away} /><span className="break-words [overflow-wrap:anywhere]">{f.away}</span></span>
               </h3>
               {hasScore && (
                 <span className="shrink-0 rounded-lg bg-muted px-2.5 py-1 text-sm font-bold tabular-nums">
@@ -64,12 +51,9 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               )}
             </div>
 
-            {f.probabilitiesAvailable === false ? (
-              <p className="mt-4 text-[11px] text-muted-foreground">
-                Win Probability % · Not available yet
-              </p>
-            ) : (
+            {hasMatchProbabilities(f) && (
               <>
+                <p className="mt-4 text-[11px] font-semibold text-muted-foreground">Win Probability %</p>
                 <div className="mt-4 flex h-1.5 overflow-hidden rounded-full">
                   <div className="bg-neon" style={{ width: `${f.homeWin}%` }} />
                   {f.draw > 0 && (
@@ -86,14 +70,6 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
             )}
 
 
-            <OddsBoard
-              probability={f.probabilitiesAvailable === false ? null : f.homeWin}
-              seed={f.id}
-              books={f.books}
-              side="home"
-              selection={`${f.home} vs ${f.away} · ${f.home} to win`}
-              label={`${f.home} to win`}
-            />
           </article>
         );
       })}

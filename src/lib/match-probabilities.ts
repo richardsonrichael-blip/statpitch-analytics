@@ -1,5 +1,9 @@
 export type MatchProbabilities = { homeWin: number; draw: number; awayWin: number };
 
+export function hasMatchProbabilities(value: MatchProbabilities & { probabilitiesAvailable?: boolean }): boolean {
+  return value.probabilitiesAvailable !== false && readMatchProbabilities(value) !== null;
+}
+
 /** Accept only complete percentage distributions; do not invent absent analytics. */
 export function readMatchProbabilities(value: unknown): MatchProbabilities | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;

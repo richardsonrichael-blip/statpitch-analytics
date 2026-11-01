@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { LiveFixture } from "@/data/mock-live";
+import { hasMatchProbabilities } from "@/lib/match-probabilities";
+import { Button } from "@/components/ui/button";
 
 const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE", "1H", "2H", "HT", "ET", "BT", "P"];
 
@@ -43,7 +45,7 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
     <section className="overflow-hidden rounded-2xl border border-border bg-surface card-shadow">
       <div className="flex bg-background/60">
         {(["live", "upcoming"] as const).map((t) => (
-          <button
+          <Button variant="ghost"
             key={t}
             onClick={() => setTab(t)}
             className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition ${
@@ -53,7 +55,7 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
             }`}
           >
             {t === "live" ? "Live now" : "Upcoming"}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -72,7 +74,7 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
               params={{ teamName: f.home }}
               className="group flex items-center justify-between gap-3 p-4 transition hover:bg-foreground/5"
             >
-              <div className="flex items-center gap-3">
+               <div className="flex min-w-0 items-center gap-3">
                 {isLiveFixture(f) ? (
                   <LivePulse f={f} />
                 ) : (
@@ -80,12 +82,12 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
                     {kickoffLabel(f.utcDate)}
                   </span>
                 )}
-                <div className="space-y-0.5 text-xs font-semibold">
+                 <div className="min-w-0 space-y-0.5 break-words text-xs font-semibold [overflow-wrap:anywhere]">
                   <p>{f.home}</p>
                   <p>{f.away}</p>
                 </div>
               </div>
-              <div className="space-y-0.5 text-right">
+               <div className="shrink-0 space-y-0.5 text-right">
                 <p className="text-xs font-bold tabular-nums">
                   {f.homeScore !== null && f.awayScore !== null ? (
                     `${f.homeScore} - ${f.awayScore}`
@@ -94,13 +96,11 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
                   )}
                 </p>
 
-                {isLiveFixture(f) && f.probabilitiesAvailable !== false ? (
+                 {isLiveFixture(f) && hasMatchProbabilities(f) ? (
                   <p className="text-[10px] tabular-nums text-muted-foreground">
                     {f.homeWin}% · {f.draw}% · {f.awayWin}%
                   </p>
-                ) : isLiveFixture(f) ? (
-                  <p className="text-[10px] text-muted-foreground">Win % N/A</p>
-                ) : null}
+                 ) : null}
                 <p className="text-[10px] text-neon group-hover:underline">Analysis →</p>
               </div>
             </Link>
