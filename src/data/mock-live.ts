@@ -23,6 +23,8 @@ export type LiveFixture = {
   statusShort?: string;
   minute?: number | null;
   minuteExtra?: number | null;
+  /** Actual successful score/minute retrieval time, preserved when serving cached data. */
+  scoresUpdatedAt?: string;
   homeWin: number;
   draw: number;
   awayWin: number;

@@ -2,6 +2,7 @@ import type { LiveFixture } from "@/data/mock-live";
 import { TeamCrest } from "@/components/statpitch/TeamCrest";
 import { isLiveFixture } from "@/components/statpitch/LiveRail";
 import { hasMatchProbabilities } from "@/lib/match-probabilities";
+import { MatchFreshness } from "@/components/statpitch/MatchFreshness";
 
 function formatKickoff(iso: string) {
   const d = new Date(iso);
@@ -51,6 +52,7 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
               )}
             </div>
 
+            {isLive && <MatchFreshness updatedAt={f.scoresUpdatedAt} />}
             {hasMatchProbabilities(f) && (
               <>
                 <p className="mt-4 text-[11px] font-semibold text-muted-foreground">Win Probability %</p>
