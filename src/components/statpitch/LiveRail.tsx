@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import type { LiveFixture } from "@/data/mock-live";
 import { hasMatchProbabilities } from "@/lib/match-probabilities";
 import { Button } from "@/components/ui/button";
+import { MatchFreshness } from "@/components/statpitch/MatchFreshness";
 
 const LIVE_STATUSES = ["IN_PLAY", "PAUSED", "LIVE", "1H", "2H", "HT", "ET", "BT", "P"];
 
@@ -72,8 +73,9 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
             <Link
               to="/team/$teamName"
               params={{ teamName: f.home }}
-              className="group flex items-center justify-between gap-3 p-4 transition hover:bg-foreground/5"
+              className="group block p-4 transition hover:bg-foreground/5"
             >
+              <div className="flex items-center justify-between gap-3">
                <div className="flex min-w-0 items-center gap-3">
                 {isLiveFixture(f) ? (
                   <LivePulse f={f} />
@@ -103,6 +105,8 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
                  ) : null}
                 <p className="text-[10px] text-neon group-hover:underline">Analysis →</p>
               </div>
+              </div>
+              {isLiveFixture(f) && <MatchFreshness updatedAt={f.scoresUpdatedAt} />}
             </Link>
           </li>
         ))}

@@ -2,6 +2,7 @@ import type { LiveFixture } from "@/data/mock-live";
 import { AiPredictionPanel } from "@/components/statpitch/AiPredictionPanel";
 import { hasMatchProbabilities } from "@/lib/match-probabilities";
 import { isLiveFixture } from "@/components/statpitch/LiveRail";
+import { MatchFreshness } from "@/components/statpitch/MatchFreshness";
 
 function Bar({ label, value, tone }: { label: string; value: number; tone?: "muted" }) {
   return (
@@ -80,6 +81,7 @@ export function HeroMatch({ fixture }: { fixture?: LiveFixture | undefined }) {
         )}
       </div>
 
+      {isLive && <MatchFreshness updatedAt={fixture.scoresUpdatedAt} />}
       {hasProb && <div className="mt-6 border-t border-border pt-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Win Probability %

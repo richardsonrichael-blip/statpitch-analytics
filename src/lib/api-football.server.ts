@@ -116,6 +116,7 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
       throw new Error(JSON.stringify(errs));
     }
 
+    const scoresUpdatedAt = new Date().toISOString();
     const rank = (s: string) => (s === "IN_PLAY" ? 0 : s === "TIMED" ? 1 : 2);
     const oddsByFixture = await fetchMatchWinnerOdds(key, day);
 
@@ -157,6 +158,7 @@ export async function fetchTodayFootball(): Promise<MatchesPayload | null> {
           statusShort: f.fixture.status.short,
           minute: f.fixture.status.elapsed ?? null,
           minuteExtra: f.fixture.status.extra ?? null,
+          scoresUpdatedAt,
           pills: [f.league.name, status === "IN_PLAY" ? "In play" : status === "FINISHED" ? "Full time" : "Upcoming"],
           // Probabilities come only from real 1X2 odds; never invent them.
           homeWin: probabilities?.homeWin ?? 0,

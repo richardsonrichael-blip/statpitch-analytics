@@ -14,3 +14,4 @@ Use the shared sports directory for navigation and server validation so every su
 Read explicit match probability distributions before legacy price-derived probabilities so analytics-only fixtures do not require bookmaker data.
 - Football fixtures come from API-Football server-side (15-min cache, 100 req/day plan) and fall back to the matches table; the key stays server-only so it is never shipped to browsers.
 Use shared TeamCrest and hasMatchProbabilities fallbacks for match displays so unavailable badges and analytics collapse consistently.
+Live score freshness uses the successful fixture retrieval timestamp, never the browser query time or kickoff, so cached and fallback data cannot appear newly updated.
