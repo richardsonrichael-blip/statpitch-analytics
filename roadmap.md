@@ -6,5 +6,5 @@
 - [x] Verify all six sports and phone navigation.
 - [x] Collapse unavailable card badges and analytics; verify card layouts.
 - [x] Keep visible-page refreshes at 15 minutes after the user confirmed the free plan.
-- [ ] Show actual score retrieval times and stale-data warnings on live match displays.
+- [x] Show actual score retrieval times and stale-data warnings on live match displays.
 - [ ] Enable one-minute live provider updates — blocked by the confirmed 100-requests/day free plan; needs increased provider allowance.
