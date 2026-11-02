@@ -67,6 +67,33 @@ export type Database = {
           },
         ]
       }
+      match_comments: {
+        Row: {
+          author_name: string
+          body: string
+          created_at: string
+          id: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          body: string
+          created_at?: string
+          id?: string
+          match_id: string
+          user_id?: string
+        }
+        Update: {
+          author_name?: string
+          body?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           away_score: number | null

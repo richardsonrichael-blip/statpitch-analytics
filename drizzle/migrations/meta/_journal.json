@@ -15,6 +15,13 @@
       "when": 1791511141445,
       "tag": "0001_add_multi_sport_probabilities",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793653130985,
+      "tag": "0002_match_comments",
+      "breakpoints": true
     }
   ]
 }
