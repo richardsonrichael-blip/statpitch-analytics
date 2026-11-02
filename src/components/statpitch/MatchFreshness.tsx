@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Clock3, TriangleAlert } from "lucide-react";
 import { matchFreshness } from "@/lib/match-freshness";
 
-export function MatchFreshness({ updatedAt }: { updatedAt?: string }) {
+export function MatchFreshness({ updatedAt }: { updatedAt?: string | undefined }) {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
