@@ -9,6 +9,8 @@ import { ValueBetsTab } from "@/components/statpitch/ValueBetsTab";
 import { PricingModal } from "@/components/statpitch/PricingModal";
 import { ProRail } from "@/components/statpitch/ProRail";
 import { LiveRail } from "@/components/statpitch/LiveRail";
+import { MatchDetailsDrawer } from "@/components/statpitch/MatchDetailsDrawer";
+import type { LiveFixture } from "@/data/mock-live";
 import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
 import { SPORTS, type SportId } from "@/data/sports";
 import { Button } from "@/components/ui/button";
@@ -51,6 +53,7 @@ const tabs = [
 function Index() {
   const { data: football } = useSuspenseQuery(matchesQueryOptions);
   const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<LiveFixture | null>(null);
   const [tab, setTab] = useState<(typeof tabs)[number]>("Fixtures & Trends");
   const [sport, setSport] = useState<SportId>("football");
   const [pricingOpen, setPricingOpen] = useState(false);
@@ -110,7 +113,7 @@ function Index() {
           </div>
           <div className="space-y-6 lg:col-span-4">
             <ProRail onSeeAll={() => setPricingOpen(true)} />
-            <LiveRail fixtures={sportFixtures} />
+            <LiveRail fixtures={sportFixtures} onOpen={setSelected} />
           </div>
         </div>
 
@@ -136,7 +139,7 @@ function Index() {
           </p>
         ) : (
           <>
-            {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} />}
+            {tab === "Fixtures & Trends" && <FixturesTab fixtures={filtered} onOpen={setSelected} />}
             {tab === "H2H Comparison" && <H2HTab />}
             {tab === "Probability Analytics" && (
               <ValueBetsTab
@@ -162,6 +165,7 @@ function Index() {
         </div>
       </footer>
 
+      <MatchDetailsDrawer fixture={selected} onClose={() => setSelected(null)} />
       <PricingModal open={pricingOpen} onOpenChange={setPricingOpen} />
     </div>
   );

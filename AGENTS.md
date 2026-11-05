@@ -15,3 +15,4 @@ Read explicit match probability distributions before legacy price-derived probab
 - Football fixtures come from API-Football server-side (15-min cache, 100 req/day plan) and fall back to the matches table; the key stays server-only so it is never shipped to browsers.
 Use shared TeamCrest and hasMatchProbabilities fallbacks for match displays so unavailable badges and analytics collapse consistently.
 Live score freshness uses the successful fixture retrieval timestamp, never the browser query time or kickoff, so cached and fallback data cannot appear newly updated.
+- Match details drawer loads per-fixture API-Football detail (fixture, odds, H2H, standings) on open with a 15-min cache, so list views never spend detail requests.
