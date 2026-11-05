@@ -219,7 +219,7 @@ function Chat({ matchId }: { matchId: string }) {
           <Button onClick={send} disabled={sending || !text.trim()}>Send</Button>
         </div>
       ) : (
-        <Link to="/auth" className="block rounded-xl border border-neon/40 bg-neon/10 p-3 text-center text-sm font-semibold text-neon">
+        <Link to="/auth" search={{ redirect: "/" }} className="block rounded-xl border border-neon/40 bg-neon/10 p-3 text-center text-sm font-semibold text-neon">
           Sign in to join the match chat
         </Link>
       )}
