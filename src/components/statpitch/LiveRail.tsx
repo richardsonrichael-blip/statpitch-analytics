@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import type { LiveFixture } from "@/data/mock-live";
 import { hasMatchProbabilities } from "@/lib/match-probabilities";
 import { Button } from "@/components/ui/button";
@@ -34,7 +33,7 @@ function kickoffLabel(iso: string) {
 }
 
 /** Compact live / upcoming fixture rail for the command-centre grid. */
-export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
+export function LiveRail({ fixtures, onOpen }: { fixtures: LiveFixture[]; onOpen?: (f: LiveFixture) => void }) {
   const [tab, setTab] = useState<"live" | "upcoming">("live");
 
   const live = fixtures.filter(isLiveFixture);
@@ -70,10 +69,10 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
         )}
         {list.map((f) => (
           <li key={f.id}>
-            <Link
-              to="/team/$teamName"
-              params={{ teamName: f.home }}
-              className="group block p-4 transition hover:bg-foreground/5"
+            <button
+              type="button"
+              onClick={() => onOpen?.(f)}
+              className="group block w-full p-4 text-left transition hover:bg-foreground/5"
             >
               <div className="flex items-center justify-between gap-3">
                <div className="flex min-w-0 items-center gap-3">
@@ -103,11 +102,11 @@ export function LiveRail({ fixtures }: { fixtures: LiveFixture[] }) {
                     {f.homeWin}% · {f.draw}% · {f.awayWin}%
                   </p>
                  ) : null}
-                <p className="text-[10px] text-neon group-hover:underline">Analysis →</p>
+                <p className="text-[10px] text-neon group-hover:underline">Match details →</p>
               </div>
               </div>
               {isLiveFixture(f) && <MatchFreshness updatedAt={f.scoresUpdatedAt} />}
-            </Link>
+            </button>
           </li>
         ))}
       </ul>
