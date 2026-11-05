@@ -8,3 +8,5 @@
 - [x] Keep visible-page refreshes at 15 minutes after the user confirmed the free plan.
 - [x] Show actual score retrieval times and stale-data warnings on live match displays.
 - [ ] Enable one-minute live provider updates — blocked by the confirmed 100-requests/day free plan; needs increased provider allowance.
+- [ ] Add authenticated AI football match explanations with streamed output and missing-data warnings.
+- [ ] Verify AI explanation generation and phone layout.
