@@ -13,7 +13,7 @@ function formatKickoff(iso: string) {
   });
 }
 
-export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
+export function FixturesTab({ fixtures, onOpen }: { fixtures: LiveFixture[]; onOpen?: (f: LiveFixture) => void }) {
   if (fixtures.length === 0) {
     return (
       <p className="rounded-2xl border border-border bg-surface p-6 text-sm text-muted-foreground">
@@ -30,7 +30,11 @@ export function FixturesTab({ fixtures }: { fixtures: LiveFixture[] }) {
         return (
           <article
             key={f.id}
-            className="min-w-0 rounded-lg border border-border bg-surface p-5 transition hover:border-neon/40 card-shadow"
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpen?.(f)}
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onOpen?.(f)}
+            className="min-w-0 cursor-pointer rounded-lg border border-border bg-surface p-5 transition hover:border-neon/40 card-shadow"
           >
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
               <span className="font-semibold uppercase tracking-widest">{f.league}</span>
