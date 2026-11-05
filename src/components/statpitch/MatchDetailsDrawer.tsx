@@ -289,6 +289,7 @@ export function MatchDetailsDrawer({ fixture, onClose }: { fixture: LiveFixture 
         </div>
       );
     if (needsDetails && isLoading) return <Empty>Loading match data…</Empty>;
+    if (!d && tab === "Overview") return <div className="space-y-5"><Probabilities f={f} /><Empty>Goals, cards and substitutions appear here for live-feed football matches.</Empty></div>;
     if (!d) return <Empty>Detailed data is only available for live-feed football matches.</Empty>;
     if (tab === "Overview") return <div className="space-y-5"><Probabilities f={f} /><Timeline d={d} f={f} filter /></div>;
     if (tab === "Box Score") return <Timeline d={d} f={f} />;
