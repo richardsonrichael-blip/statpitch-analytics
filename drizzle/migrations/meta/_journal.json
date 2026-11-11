@@ -22,6 +22,13 @@
       "when": 1793653130985,
       "tag": "0002_match_comments",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794421593336,
+      "tag": "0003_ai_explanation_access_state",
+      "breakpoints": true
     }
   ]
 }

@@ -16,3 +16,4 @@ Read explicit match probability distributions before legacy price-derived probab
 Use shared TeamCrest and hasMatchProbabilities fallbacks for match displays so unavailable badges and analytics collapse consistently.
 Live score freshness uses the successful fixture retrieval timestamp, never the browser query time or kickoff, so cached and fallback data cannot appear newly updated.
 - Match details drawer loads per-fixture API-Football detail (fixture, odds, H2H, standings) on open with a 15-min cache, so list views never spend detail requests.
+- Match explanations use an authenticated streaming server route with server-resolved public football context only; model credentials and persistent provider-denial state stay server-only to prevent forged inputs and replayed denied calls.

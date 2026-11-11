@@ -16,6 +16,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as TeamTeamNameRouteImport } from './routes/team.$teamName'
+import { Route as ApiPublicMatchExplanationRouteImport } from './routes/api/public/match-explanation'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -52,6 +53,12 @@ const TeamTeamNameRoute = TeamTeamNameRouteImport.update({
   path: '/team/$teamName',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMatchExplanationRoute =
+  ApiPublicMatchExplanationRouteImport.update({
+    id: '/api/public/match-explanation',
+    path: '/api/public/match-explanation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPaystackWebhookRoute =
   ApiPublicPaystackWebhookRouteImport.update({
     id: '/api/public/paystack-webhook',
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/team/$teamName': typeof TeamTeamNameRoute
+  '/api/public/match-explanation': typeof ApiPublicMatchExplanationRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/team/$teamName': typeof TeamTeamNameRoute
+  '/api/public/match-explanation': typeof ApiPublicMatchExplanationRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRoutesById {
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/team/$teamName': typeof TeamTeamNameRoute
+  '/api/public/match-explanation': typeof ApiPublicMatchExplanationRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
 }
 export interface FileRouteTypes {
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/team/$teamName'
+    | '/api/public/match-explanation'
     | '/api/public/paystack-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/dashboard'
     | '/team/$teamName'
+    | '/api/public/match-explanation'
     | '/api/public/paystack-webhook'
   id:
     | '__root__'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_authenticated/dashboard'
     | '/team/$teamName'
+    | '/api/public/match-explanation'
     | '/api/public/paystack-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -126,6 +139,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   TeamTeamNameRoute: typeof TeamTeamNameRoute
+  ApiPublicMatchExplanationRoute: typeof ApiPublicMatchExplanationRoute
   ApiPublicPaystackWebhookRoute: typeof ApiPublicPaystackWebhookRoute
 }
 
@@ -180,6 +194,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamTeamNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/match-explanation': {
+      id: '/api/public/match-explanation'
+      path: '/api/public/match-explanation'
+      fullPath: '/api/public/match-explanation'
+      preLoaderRoute: typeof ApiPublicMatchExplanationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/paystack-webhook': {
       id: '/api/public/paystack-webhook'
       path: '/api/public/paystack-webhook'
@@ -208,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   TeamTeamNameRoute: TeamTeamNameRoute,
+  ApiPublicMatchExplanationRoute: ApiPublicMatchExplanationRoute,
   ApiPublicPaystackWebhookRoute: ApiPublicPaystackWebhookRoute,
 }
 export const routeTree = rootRouteImport
