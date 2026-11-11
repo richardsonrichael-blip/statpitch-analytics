@@ -17,3 +17,4 @@ Use shared TeamCrest and hasMatchProbabilities fallbacks for match displays so u
 Live score freshness uses the successful fixture retrieval timestamp, never the browser query time or kickoff, so cached and fallback data cannot appear newly updated.
 - Match details drawer loads per-fixture API-Football detail (fixture, odds, H2H, standings) on open with a 15-min cache, so list views never spend detail requests.
 - Match explanations use an authenticated streaming server route with server-resolved public football context only; model credentials and persistent provider-denial state stay server-only to prevent forged inputs and replayed denied calls.
+- Emit AI engagement events directly from existing tab, stream-completion and section-visibility handlers through the injected Lovable events global; send only fixed section labels, never match text or account data.

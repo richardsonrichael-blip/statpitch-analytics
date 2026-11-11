@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "events": {
+    "project.ai_analysis_opened": {
+      "event_schema_version": 1,
+      "description": "A fan switches from another match tab to AI Analysis.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      }
+    },
+    "project.ai_explanation_generated": {
+      "event_schema_version": 1,
+      "description": "An explanation stream finishes successfully with nonempty output, not stopped or failed.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      }
+    },
+    "project.ai_explanation_section_viewed": {
+      "event_schema_version": 1,
+      "description": "At least half of a key explanation heading becomes visible, once per section per generation.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "section"
+        ],
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "match_snapshot",
+              "numbers",
+              "talking_points",
+              "limits"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

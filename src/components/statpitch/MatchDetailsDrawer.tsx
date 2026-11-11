@@ -376,7 +376,12 @@ export function MatchDetailsDrawer({ fixture, onClose }: { fixture: LiveFixture 
               {TABS.map((t) => (
                 <button
                   key={t}
-                  onClick={() => setTab(t)}
+                  onClick={() => {
+                    setTab(t);
+                    if (t === "AI Analysis" && tab !== "AI Analysis") {
+                      window.__lovableEvents?.track?.("project.ai_analysis_opened");
+                    }
+                  }}
                   className={`shrink-0 whitespace-nowrap border-b-2 px-3 py-3 text-[11px] font-bold uppercase tracking-widest transition-colors ${tab === t ? "border-neon text-neon" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                 >
                   {t}

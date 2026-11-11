@@ -10,3 +10,4 @@
 - [ ] Enable one-minute live provider updates — blocked by the confirmed 100-requests/day free plan; needs increased provider allowance.
 - [x] Add authenticated AI football match explanations with streamed output and missing-data warnings.
 - [x] Verify AI explanation generation and phone layout (sample fixture; real fixtures remain blocked by the suspended football provider account).
+- [x] Track AI Analysis openings, successful explanation generation and viewed explanation sections; validated three event schemas and signed-in phone flow with local capture (collector delivery awaits published-app activity).
