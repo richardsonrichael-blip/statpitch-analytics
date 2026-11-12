@@ -93,6 +93,7 @@ export type Database = {
           author_name: string
           body: string
           created_at: string
+          display_name: string
           id: string
           match_id: string
           user_id: string
@@ -101,6 +102,7 @@ export type Database = {
           author_name?: string
           body: string
           created_at?: string
+          display_name?: string
           id?: string
           match_id: string
           user_id?: string
@@ -109,6 +111,7 @@ export type Database = {
           author_name?: string
           body?: string
           created_at?: string
+          display_name?: string
           id?: string
           match_id?: string
           user_id?: string

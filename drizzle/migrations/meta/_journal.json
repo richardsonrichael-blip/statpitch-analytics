@@ -29,6 +29,13 @@
       "when": 1794421593336,
       "tag": "0003_ai_explanation_access_state",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794505956741,
+      "tag": "0004_protect_public_chat_identifiers",
+      "breakpoints": true
     }
   ]
 }

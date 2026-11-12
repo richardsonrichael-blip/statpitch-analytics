@@ -18,3 +18,4 @@ Live score freshness uses the successful fixture retrieval timestamp, never the 
 - Match details drawer loads per-fixture API-Football detail (fixture, odds, H2H, standings) on open with a 15-min cache, so list views never spend detail requests.
 - Match explanations use an authenticated streaming server route with server-resolved public football context only; model credentials and persistent provider-denial state stay server-only to prevent forged inputs and replayed denied calls.
 - Emit AI engagement events directly from existing tab, stream-completion and section-visibility handlers through the injected Lovable events global; send only fixed section labels, never match text or account data.
+- Public chat reads only column-granted public fields and display_name; keep user_id and legacy author_name inaccessible to visitor roles, and never derive display names from email.

@@ -11,3 +11,4 @@
 - [x] Add authenticated AI football match explanations with streamed output and missing-data warnings.
 - [x] Verify AI explanation generation and phone layout (sample fixture; real fixtures remain blocked by the suspended football provider account).
 - [x] Track AI Analysis openings, successful explanation generation and viewed explanation sections; validated three event schemas and signed-in phone flow with local capture (collector delivery awaits published-app activity).
+- [x] Hide account identifiers and legacy email-derived names from public chat; verified anonymous safe-field reads, denied identifier reads, signed-in posting and own-comment deletion without changing fixture access.

@@ -14,6 +14,7 @@ import { momentumBuckets, type MatchDetails } from "@/lib/match-details.types";
 import { useAuthSession } from "@/hooks/useProAccess";
 import { supabase } from "@/integrations/supabase/client";
 import { MatchExplanation } from "@/components/statpitch/MatchExplanation";
+import { chatDisplayName } from "@/lib/chat-display-name";
 
 const TABS = ["Overview", "AI Analysis", "Stats", "Box Score", "Odds", "Predictions & Tips", "H2H", "Standings", "Live Tracker", "Chat"] as const;
 type Tab = (typeof TABS)[number];
@@ -173,7 +174,7 @@ function Tracker({ d, f }: { d: MatchDetails; f: LiveFixture }) {
   );
 }
 
-type Comment = { id: string; author_name: string; body: string; created_at: string; user_id: string };
+type Comment = { id: string; display_name: string; body: string; created_at: string };
 
 function Chat({ matchId }: { matchId: string }) {
   const { user } = useAuthSession();
@@ -185,7 +186,7 @@ function Chat({ matchId }: { matchId: string }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("match_comments")
-        .select("id, author_name, body, created_at, user_id")
+        .select("id, display_name, body, created_at")
         .eq("match_id", matchId)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -198,8 +199,8 @@ function Chat({ matchId }: { matchId: string }) {
     const body = text.trim().slice(0, 500);
     if (!body || !user) return;
     setSending(true);
-    const name = (user.user_metadata?.["full_name"] as string | undefined) ?? user.email?.split("@")[0] ?? "Fan";
-    await supabase.from("match_comments").insert({ match_id: matchId, body, author_name: name.slice(0, 40) });
+    const name = chatDisplayName(user.user_metadata?.["full_name"]);
+    await supabase.from("match_comments").insert({ match_id: matchId, body, display_name: name });
     setText("");
     setSending(false);
     qc.invalidateQueries({ queryKey: ["match-comments", matchId] });
@@ -231,7 +232,7 @@ function Chat({ matchId }: { matchId: string }) {
           {comments.map((c) => (
             <li key={c.id} className="rounded-xl bg-background/60 p-3 text-sm">
               <p className="text-[11px] text-muted-foreground">
-                <span className="font-bold text-foreground">{c.author_name}</span> ·{" "}
+                <span className="font-bold text-foreground">{chatDisplayName(c.display_name)}</span> ·{" "}
                 {new Date(c.created_at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
               </p>
               <p className="mt-0.5 break-words">{c.body}</p>
