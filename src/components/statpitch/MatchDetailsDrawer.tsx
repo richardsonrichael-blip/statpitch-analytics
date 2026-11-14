@@ -15,8 +15,9 @@ import { useAuthSession } from "@/hooks/useProAccess";
 import { supabase } from "@/integrations/supabase/client";
 import { MatchExplanation } from "@/components/statpitch/MatchExplanation";
 import { chatDisplayName } from "@/lib/chat-display-name";
+import { WatchPanel } from "@/components/statpitch/WatchPanel";
 
-const TABS = ["Overview", "AI Analysis", "Stats", "Box Score", "Odds", "Predictions & Tips", "H2H", "Standings", "Live Tracker", "Chat"] as const;
+const TABS = ["Overview", "Watch", "AI Analysis", "Stats", "Box Score", "Odds", "Predictions & Tips", "H2H", "Standings", "Live Tracker", "Chat"] as const;
 type Tab = (typeof TABS)[number];
 const FAV_KEY = "statpitch:favorite-teams";
 
@@ -276,6 +277,7 @@ export function MatchDetailsDrawer({ fixture, onClose }: { fixture: LiveFixture 
 
   const body = (): ReactNode => {
     if (!f) return null;
+    if (tab === "Watch" && !(isLoading && !d)) return <WatchPanel f={f} d={d} />;
     if (tab === "AI Analysis") return <MatchExplanation key={f.id} fixture={f} />;
     if (tab === "Chat") return <Chat matchId={f.id} />;
     if (tab === "Odds") return <OddsTable d={d} f={f} />;
