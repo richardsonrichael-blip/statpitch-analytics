@@ -14,6 +14,8 @@ import type { LiveFixture } from "@/data/mock-live";
 import { matchesQuery, matchesQueryOptions } from "@/lib/matches.query";
 import { SPORTS, type SportId } from "@/data/sports";
 import { Button } from "@/components/ui/button";
+import { useGoalAlerts } from "@/hooks/useGoalAlerts";
+import { Bell, BellOff } from "lucide-react";
 
 
 export const Route = createFileRoute("/")({
@@ -71,6 +73,7 @@ function Index() {
   }, [query, sportFixtures]);
 
   const loading = sport !== "football" && sportQuery.isPending;
+  const alerts = useGoalAlerts(football.fixtures);
 
   return (
     <div className="min-h-screen">
@@ -113,6 +116,10 @@ function Index() {
           </div>
           <div className="space-y-6 lg:col-span-4">
             <ProRail onSeeAll={() => setPricingOpen(true)} />
+            <Button variant="outline" onClick={alerts.toggle} aria-pressed={alerts.enabled} className="w-full gap-2 text-xs font-bold uppercase tracking-widest">
+              {alerts.enabled ? <Bell className="h-4 w-4 text-neon" /> : <BellOff className="h-4 w-4" />}
+              Goal alerts {alerts.enabled ? "on" : "off"}
+            </Button>
             <LiveRail fixtures={sportFixtures} onOpen={setSelected} />
           </div>
         </div>
